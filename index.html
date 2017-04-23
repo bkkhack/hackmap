@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>BKKHackmap</title>
+        <!-- bkkhack github organization favicon -->
+        <link rel="icon" href="https://avatars2.githubusercontent.com/u/15698632?v=3&s=200">
+        <link rel="stylesheet" href="style/main.css">
+    </head>
+    <body>
+        <div class="projects side-column">
+            <div class="project-form" v-bind:class="{ open: form.isOpen }">
+                <input v-model="form.title" type="text" placeholder="Topic" autofocus>
+                <textarea v-model="form.description" placeholder="More description (optional)"></textarea>
+            </div>
+            <button class="glow-button" v-on:click="toggleForm">+ Add your hack</button>
+            <div v-for="project in projects"
+                 v-on:dragstart="drag"
+                 v-on:click="selectedProject = project"
+                 v-bind:key="project.id"
+                 v-bind:data-id="project.id"
+                 v-bind:class="{ selected: selectedProject === project }"
+                 v-cloak
+                 draggable="true"
+                 class="project">
+                <img v-bind:src="project.avatar_thumbnail" v-bind:alt="project.username" draggable="false" />
+                {{project.title}}
+            </div>
+            <div class="loader" v-if="projects.length === 0">
+                <div class="loader1"></div>
+                <div class="loader2"></div>
+                <div class="loader3"></div>
+            </div>
+        </div>
+        <div class="center-column">
+            <h1>BKKHackmap</h1>
+            <div class="droptarget"
+                 v-on:dragover="dragover"
+                 v-on:drop="drop">
+                <img src="images/kaidee.svg" class="floorplan" />
+                <img class="marker"
+                     v-for="project in projects"
+                     v-if="project.x"
+                     v-bind:key="project.id"
+                     v-on:dragstart="drag"
+                     v-on:click="selectedProject = project"
+                     v-bind:class="{ selected: selectedProject === project }"
+                     v-bind:data-id="project.id"
+                     v-bind:style="{ left: mapWidth * project.x - 20 + 'px', top: mapHeight * project.y - 20 + 'px' }"
+                     v-bind:src="project.avatar_thumbnail"
+                     v-bind:alt="project.username"
+                     v-bind:title="project.title" />
+            </div>
+        </div>
+        <div class="details side-column" v-cloak>
+            <img class="avatar"
+                v-bind:src="selectedProject.avatar"
+                v-bind:alt="selectedProject.username" />
+            <h2>{{selectedProject.title}}</h2>
+            <p>{{selectedProject.description}}</p>
+        </div>
+        <script src="build/vendor.bundle.js"></script>
+        <script src="build/bundle.js"></script>
+    </body>
+</html>
