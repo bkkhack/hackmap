@@ -8,7 +8,7 @@
     "watch": "webpack-dev-server --progress --colors",
     "build:dev": "webpack",
     "build:dist": "webpack -p",
-    "build": "./build.sh"
+    "build": "if [ `git name-rev --name-only HEAD` = 'gh-pages' ]; then npm run build:dist; else npm run build:dev; fi"
   },
   "author": "",
   "license": "ISC",
