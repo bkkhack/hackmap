@@ -20,8 +20,8 @@
                  v-bind:key="project.id"
                  v-bind:data-id="project.id"
                  v-bind:class="{ selected: selectedProject === project }"
+                 v-bind:draggable="project.username === username"
                  v-cloak
-                 draggable="true"
                  class="project">
                 <img v-bind:src="project.avatar_thumbnail" v-bind:alt="project.username" draggable="false" />
                 {{project.title}}
@@ -44,6 +44,7 @@
                      v-for="project in projects"
                      v-if="project.x"
                      v-bind:key="project.id"
+                     v-bind:draggable="project.username === username"
                      v-on:dragstart="drag"
                      v-on:click="selectedProject = project"
                      v-bind:class="{ selected: selectedProject === project }"
