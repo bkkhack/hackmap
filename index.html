@@ -34,6 +34,8 @@
         </div>
         <div class="center-column">
             <h1>BKKHackmap</h1>
+            <a class="account-status" v-if="username" v-on:click="logout">{{username}} (Log out)</a>
+            <a class="account-status" v-else v-on:click="login">Log in</a>
             <div class="droptarget"
                  v-on:dragover="dragover"
                  v-on:drop="drop">

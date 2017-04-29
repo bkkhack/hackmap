@@ -173,6 +173,16 @@ h1 {
 /*
  * Main Column - map
  */
+.account-status {
+    display:block;
+    position:absolute;
+    top:0;
+    right:0;
+    margin:0;
+    font-size:12pt;
+    padding:10px 15px 0 0;
+    cursor:pointer;
+}
 .droptarget {
     width:90%;
 

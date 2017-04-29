@@ -12,8 +12,10 @@ const model = {
         description: ""
     },
     selectedProject: {},
-    authenticationUrl: ""
+    authenticationUrl: "",
+    username: ""
 }
+
 const githubIssue = new GitHubIssueService({
     organization: "waf",
     repository: "hackmap",
@@ -22,9 +24,11 @@ const githubIssue = new GitHubIssueService({
     pollIntervalSeconds: 60,
     onProjectsUpdated: projects => {
         model.projects = projects;
+    },
+    onUserAuthenticated: response => {
+        model.username = response.data.login;
     }
 });
-
 
 var projectsColumn = new Vue({
     el: '.projects.side-column',
@@ -101,6 +105,13 @@ var map = new Vue({
             model.mapWidth = floorplan.clientWidth;
             model.mapHeight = floorplan.clientHeight;
         },
+        login: function() {
+            githubIssue.ensureAuthenticatedClient();
+        },
+        logout: function() {
+            model.username = "";
+            githubIssue.deauthenticateClient();
+        }
     },
     mounted: function () {
         window.addEventListener('resize', this.updateMapDimensions);

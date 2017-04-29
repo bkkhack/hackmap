@@ -19,7 +19,7 @@ import auth from './github-oauth.js'
 export default class GitHubIssueService {
     constructor(config) {
         this.config = config;
-        this.ajax = this.createGithubApiClient(config.organization, config.repository);
+        this.github = this.createGithubApiClient(config.organization, config.repository);
 
         // if the user has already logged in (e.g. in a previous session), use the
         // authenticated client for all operations. Authenticated calls have a
@@ -30,9 +30,9 @@ export default class GitHubIssueService {
 
         // issue ajax requests to load data from github
         // the model will be updated periodically from the callbacks
-        this.ajax.get('issues', { params: { labels: this.config.label } })
+        this.github.repo.get('issues', { params: { labels: this.config.label } })
             .then(issueResponse => {
-                if(!(issueResponse.data || issueResponse.data.length)) {
+                if(!issueResponse.data.length) {
                     throw "Could not find an open issue labeled: " + this.config.label;
                 }
                 this.issueNumber = issueResponse.data[0].number;
@@ -45,7 +45,7 @@ export default class GitHubIssueService {
         return this.ensureAuthenticatedClient()
             .then(() => {
                 let body = serialization.serializeProjectToComment(project);
-                return this.ajax
+                return this.github.repo
                     .post('issues/' + this.issueNumber + '/comments', { body: body });
             })
             .then((response) => {
@@ -57,7 +57,7 @@ export default class GitHubIssueService {
         return this.ensureAuthenticatedClient()
             .then(() => {
                 let body = serialization.serializeProjectToComment(project);
-                return this.ajax.patch('issues/comments/' + project.id, { body: body });
+                return this.github.repo.patch('issues/comments/' + project.id, { body: body });
             })
             .then(response => {
                 return serialization.deserializeCommentToProject(response.data);
@@ -69,13 +69,14 @@ export default class GitHubIssueService {
 
         var poll = () => {
             console.log("polling...");
-            return this.ajax.get(commentsUrl)
-                            .then((response) => {
-                                var projects = response.data
-                                    .map(serialization.deserializeCommentToProject);
-                                this.config.onProjectsUpdated(projects);
-                            })
-                            .catch((err) => this.reportError(err));
+            return this.github.repo
+                .get(commentsUrl)
+                .then(response => {
+                    var projects = response.data
+                        .map(serialization.deserializeCommentToProject);
+                    this.config.onProjectsUpdated(projects);
+                })
+                .catch(err => this.reportError(err));
         }
 
         window.setInterval(poll, 1000 * this.config.pollIntervalSeconds);
@@ -85,23 +86,40 @@ export default class GitHubIssueService {
     ensureAuthenticatedClient() {
         return this.config.onAuthenticationRequired()
             .then(token => {
-                this.ajax = this.createGithubApiClient(
+                this.github = this.createGithubApiClient(
                         this.config.organization,
                         this.config.repository,
                         token);
+                return this.github.get("user");
+            }).then(response => {
+                this.config.onUserAuthenticated(response);
             });
     }
 
+    deauthenticateClient() {
+        auth.logOut();
+        this.github = this.createGithubApiClient(
+                this.config.organization,
+                this.config.repository);
+    }
+
     createGithubApiClient(org, repo, token) {
-        var ajaxConfig = {
-            baseURL: 'https://api.github.com/repos/' + org + '/' + repo + '/',
-        };
-        if(token) {
-            ajaxConfig.headers = {
-                'Authorization': 'token ' + token
-            };
+        function getApiConfig(apiPath) {
+            var config = {
+                baseURL: 'https://api.github.com/' + (apiPath || ''),
+            }
+            if(token) {
+                config.headers = { 'Authorization': 'token ' + token };
+            }
+            return config;
         }
-        return axios.create(ajaxConfig);
+        // general github ajax client
+        var github = axios.create(getApiConfig());
+
+        // repo-specific ajax client
+        github.repo = axios.create(getApiConfig(`repos/${org}/${repo}/`));
+
+        return github;
     }
 
     reportError(err) {

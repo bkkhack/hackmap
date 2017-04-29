@@ -14,6 +14,9 @@ export default {
     isLoggedIn: function() {
         return !!window.localStorage.getItem(tokenKey);
     },
+    logOut: function() {
+        window.localStorage.removeItem(tokenKey);
+    },
     // implements https://developer.github.com/v3/oauth/#web-application-flow
     getOAuthToken: function() {
         return new Promise((resolve, reject) => {
