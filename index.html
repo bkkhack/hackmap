@@ -34,8 +34,8 @@
         </div>
         <div class="center-column">
             <h1>BKKHackmap</h1>
-            <a class="account-status" v-if="username" v-on:click="logout">{{username}} (Log out)</a>
-            <a class="account-status" v-else v-on:click="login">Log in</a>
+            <a class="account-status" v-if="username" v-on:click="logout" v-cloak>{{username}} (Log out)</a>
+            <a class="account-status" v-else v-on:click="login" v-cloak>Log in</a>
             <div class="droptarget"
                  v-on:dragover="dragover"
                  v-on:drop="drop">
@@ -55,12 +55,23 @@
                      v-bind:title="project.title" />
             </div>
         </div>
-        <div class="details side-column" v-cloak>
-            <img class="avatar"
-                v-bind:src="selectedProject.avatar"
-                v-bind:alt="selectedProject.username" />
-            <h2>{{selectedProject.title}}</h2>
-            <p>{{selectedProject.description}}</p>
+        <div class="details side-column">
+            <template v-if="selectedProject.id" v-cloak>
+                <a class="edit-button" v-if="selectedProject.username === username" v-on:click="toggleEditMode">{{selectedProject.editMode ? "X" : "Edit"}}</a>
+                <img class="avatar"
+                    v-bind:src="selectedProject.avatar"
+                    v-bind:alt="selectedProject.username" />
+                <p><a v-bind:href="'https://github.com/' + selectedProject.username">@{{selectedProject.username}}</a> is hacking on:</p>
+                <template v-if="!selectedProject.editMode">
+                    <h2>{{selectedProject.title}}</h2>
+                    <p class='selected-project-description'>{{selectedProject.description}}</p>
+                </template>
+                <template v-else>
+                    <input v-model="selectedProject.title" type="text" autofocus>
+                    <textarea v-model="selectedProject.description"></textarea>
+                    <button class="glow-button" v-on:click="updateProject">Update</button>
+                </template>
+            </template>
         </div>
         <script src="build/vendor.bundle.js"></script>
         <script src="build/bundle.js"></script>

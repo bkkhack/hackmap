@@ -22,6 +22,7 @@ export default {
             avatar: comment.user.avatar_url + "&s=" + 120,
             x: coords.x,
             y: coords.y,
+            editMode: false
         };
     },
 

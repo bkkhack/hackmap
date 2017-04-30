@@ -22,14 +22,46 @@ body {
     justify-content:flex-start;
     align-items:stretch;
 }
+a {
+    color:#fff;
+    font-weight:bold;
+    text-decoration:none;
+    cursor:pointer;
+}
 h1 {
     font-weight:normal;
     text-align:center;
     font-size:24pt;
     margin:0;
+    -webkit-user-select: none;
+    user-select: none;
+}
+input[type='text'], textarea {
+    box-sizing:border-box;
+    border-radius:5px;
+    font-size:1em;
+    width:100%;
+    margin-bottom:5px;
+    padding: 0.4em;
+    outline:none;
+    transition:background-color linear 0.2s;
+    background-color:rgba(255,255,255,.9);
+}
+input:focus,
+textarea:focus {
+    background-color:rgba(255,255,255,1);
+}
+textarea {
+    height:200px;
+}
+img[draggable="true"],
+div[draggable="true"] {
+    cursor:pointer;
 }
 [v-cloak] {
-    display: none;
+    /* If marked with v-cloak (vue cloak), this overrides everything.
+     * Vue will remove this attribute when it's initialized. */
+    visibility: hidden !important;
 }
 
 /*
@@ -97,25 +129,6 @@ h1 {
 .project-form.open {
     max-height:500px;
 }
-.project-form input,
-.project-form textarea {
-    box-sizing:border-box;
-    border-radius:5px;
-    font-size:1em;
-    width:100%;
-    margin-bottom:5px;
-    padding: 0.4em;
-    outline:none;
-    transition:background-color linear 0.2s;
-    background-color:rgba(255,255,255,.9);
-}
-.project-form input:focus,
-.project-form textarea:focus {
-    background-color:rgba(255,255,255,1);
-}
-.project-form textarea {
-    height:200px;
-}
 .project {
     -webkit-user-select: none;
     user-select: none;
@@ -126,10 +139,6 @@ h1 {
     border:1px solid #777;
     margin:10px 0;
     overflow:hidden;
-}
-img[draggable="true"],
-div[draggable="true"] {
-    cursor:pointer;
 }
 .project.selected {
     border:1px solid #397ce2;
@@ -184,7 +193,6 @@ div[draggable="true"] {
     margin:0;
     font-size:12pt;
     padding:10px 15px 0 0;
-    cursor:pointer;
 }
 .droptarget {
     width:90%;
@@ -233,6 +241,19 @@ div[draggable="true"] {
     text-align:center;
     padding-top:60px;
 }
+.details h2,
+.details p {
+    margin:15px 0;
+}
 .details .avatar {
     border: 1px solid #226699;
+}
+.edit-button {
+    position:absolute;
+    top:0;
+    right:0;
+    padding:10px;
+}
+.selected-project-description {
+    white-space: pre-line; /* honor line breaks that the user typed */
 }

@@ -11,9 +11,11 @@ const model = {
         title: "",
         description: ""
     },
-    selectedProject: {},
     authenticationUrl: "",
-    username: ""
+    username: "",
+    selectedProject: {
+        editMode: false
+    }
 }
 
 const githubIssue = new GitHubIssueService({
@@ -124,5 +126,32 @@ var map = new Vue({
 
 var projectDetails = new Vue({
     el: '.details.side-column',
-    data: model
+    data: model,
+    methods: {
+        toggleEditMode: function() {
+            let project = model.selectedProject;
+            if(!project.editMode) { // entering edit mode
+                project.backup = {
+                    title: project.title,
+                    description: project.description,
+                }
+            } else { // cancelling edit mode
+                project.title = project.backup.title;
+                project.description = project.backup.description;
+            }
+            project.editMode = !project.editMode;
+        },
+        updateProject: function() {
+            githubIssue.updateProject(model.selectedProject)
+                .then(() => {
+                    model.selectedProject.editMode = false;
+                })
+                .catch(err => {
+                    console.log("update rejected");
+                    var backup = model.selectedProject.backup;
+                    model.selectedProject.title = backup.title;
+                    model.selectedProject.description = backup.description;
+                });
+        }
+    }
 })
