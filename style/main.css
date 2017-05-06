@@ -89,6 +89,11 @@ div[draggable="true"] {
     box-sizing:border-box;
     flex-basis: 300px;
 }
+.details {
+    order: 3;
+    text-align:center;
+    padding-top:60px;
+}
 
 
 /*
@@ -236,11 +241,6 @@ div[draggable="true"] {
 /*
  * Right column -- project details
  */
-.details {
-    order: 3;
-    text-align:center;
-    padding-top:60px;
-}
 .details h2,
 .details p {
     margin:15px 0;

@@ -1,3 +1,6 @@
+/* Handles converting the app's concept of a 'project'
+ * to/from the GitHub API's concept of an 'issue'
+ */
 
 const commentExtractionRegex = /<!-- ([.\d]+),([.\d]+) -->/;
 

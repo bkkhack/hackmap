@@ -1,13 +1,20 @@
+/*
+ * Handles the "oauth dance" for our application.
+ */
 import axios from 'axios' // ajax library
 
 const clientId = "1b717d04ec7f3615bb18";
 // the following url needs to match the app configuration on github.com
-const landingPage = window.location.origin + "/oauth_redirect.html";
+const landingPage = window.location.href.indexOf("index.html") >= 0 ?
+                    window.location.href.replace("index.html", "oauth_redirect.html") :
+                    window.location.href + "oauth_redirect.html";
 const tokenKey = "token";
 const oAuthUrl = `https://github.com/login/oauth/authorize?scope=public_repo&redirect_uri=${landingPage}&client_id=${clientId}`;
+// our heroku instance that hides the oauth secret. running https://github.com/prose/gatekeeper 
 const codeToTokenUrl = "https://bkkhackmap.herokuapp.com/authenticate/";
 
-// ping to wake heroku instance. we don't care about the response. we just want the oauth login to quick.
+// HTTP Options call to wake the heroku instance. we don't care about the
+// response. we just want the oauth login to be quick.
 axios.options(codeToTokenUrl);
 
 export default {
