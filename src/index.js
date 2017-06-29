@@ -10,6 +10,7 @@ import GitHubAuth from './github-oauth.js'
 // Vue.js requires the datamodel to be initialized with empty values
 // this is so it can set up getters/setters that refresh the ui on change.
 const model = {
+    helpText: "",
     projects: [],
     mapWidth:0,
     mapHeight:0,
@@ -32,6 +33,9 @@ const githubIssue = new GitHubIssueService({
     pollIntervalSeconds: 60,
     onProjectsUpdated: projects => {
         model.projects = projects;
+    },
+    onHelpText: helpText => {
+        model.helpText = helpText;
     },
     onUserAuthenticated: response => {
         model.username = response.data.login;

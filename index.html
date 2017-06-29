@@ -34,6 +34,7 @@
         </div>
         <div class="center-column">
             <h1>BKKHackmap</h1>
+            <a class="help-icon">?<div class="help-text" v-html="helpText"></div></a>
             <a class="account-status" v-if="username" v-on:click="logout" v-cloak>{{username}} (Log out)</a>
             <a class="account-status" v-else v-on:click="login" v-cloak>Log in</a>
             <div class="droptarget"

@@ -35,7 +35,9 @@ export default class GitHubIssueService {
                 if(!issueResponse.data.length) {
                     throw "Could not find an open issue labeled: " + this.config.label;
                 }
-                this.issueNumber = issueResponse.data[0].number;
+                var issue = issueResponse.data[0];
+                config.onHelpText(issue.body);
+                this.issueNumber = issue.number;
             })
             .then(() => this.pollIssueForComments())
             .catch(err => this.reportError(err));
@@ -86,13 +88,18 @@ export default class GitHubIssueService {
     ensureAuthenticatedClient() {
         return this.config.onAuthenticationRequired()
             .then(token => {
-                this.github = this.createGithubApiClient(
-                        this.config.organization,
-                        this.config.repository,
-                        token);
-                return this.github.get("user");
+                if(!this.github.isAuthenticated) {
+                    this.github = this.createGithubApiClient(
+                            this.config.organization,
+                            this.config.repository,
+                            token);
+                    this.github.isAuthenticated = true;
+                    return this.github.get("user");
+                }
             }).then(response => {
-                this.config.onUserAuthenticated(response);
+                if(response) {
+                    this.config.onUserAuthenticated(response);
+                }
             });
     }
 
