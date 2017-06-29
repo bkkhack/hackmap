@@ -23,6 +23,7 @@ const model = {
     username: "",
     selectedProject: { }
 }
+model.projects.loading = true;
 
 // encapsulates access to the github issues API
 const githubIssue = new GitHubIssueService({
