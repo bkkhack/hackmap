@@ -26,7 +26,7 @@ const model = {
 
 // encapsulates access to the github issues API
 const githubIssue = new GitHubIssueService({
-    organization: "waf",
+    organization: "bkkhack",
     repository: "hackmap",
     label: "BKKHack Main Thread",
     onAuthenticationRequired: GitHubAuth.getOAuthToken,
