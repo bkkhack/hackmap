@@ -1,0 +1,26 @@
+{
+  "name": "hackmap",
+  "version": "1.0.0",
+  "description": "A tool to help collaborate at bkkhack",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "webpack-dev-server --progress --colors",
+    "build:dev": "webpack",
+    "build:dist": "webpack -p",
+    "build": "if [ `git name-rev --name-only HEAD` = 'gh-pages' ]; then npm run build:dist; else npm run build:dev; fi"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.16.1",
+    "vue": "^2.2.6"
+  },
+  "devDependencies": {
+    "babel-core": "^6.24.0",
+    "babel-loader": "^6.4.1",
+    "babel-preset-env": "^1.3.2",
+    "webpack": "^2.3.2",
+    "webpack-dev-server": "^2.4.2"
+  }
+}
