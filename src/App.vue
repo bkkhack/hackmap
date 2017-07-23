@@ -2,14 +2,18 @@
   <div id="appContainer">
     <left
       @toggleForm="toggleForm" @updateSelectedProject="updateSelectedProject"
+      @drag="leftDrag"
       :form="form" :projects="projects"
       :selectedProject="selectedProject" :username="username">
     </left>
     <center
-      @login="login" @logout="logout"
+      @updateSelectedProject="updateSelectedProject"
+      @login="login" @logout="logout" @drop="centerDrop"
+      :projects="projects" :selectedProject="selectedProject"
       :helpText="helpText" :username="username">
     </center>
     <right
+      @toggleEditMode="toggleEditMode" @updateProject="updateProject"
       :selectedProject="selectedProject" :username="username">
     </right>
   </div>
@@ -78,15 +82,37 @@ export default {
         this.form.isOpen = false
       }
     },
-    drag (event) {
-      console.log(event)
-      // var avatar = event.target.querySelector('img')
-      // event.dataTransfer.setDragImage(avatar, 20, 20)
-      // var projectId = event.target.dataset.id
-      // event.dataTransfer.setData('projectId', projectId)
+    leftDrag (event) {
+      var avatar = event.target.querySelector('img')
+      event.dataTransfer.setDragImage(avatar, 20, 20)
+      var projectId = event.target.dataset.id
+      event.dataTransfer.setData('projectId', projectId)
     },
     updateSelectedProject (project) {
       this.selectedProject = project
+    },
+    centerDrop (event) {
+      var projectId = event.dataTransfer.getData('projectId')
+      var project = this.projects.filter(p => p.id === parseInt(projectId))[0]
+      this.updateMapDimensions()
+      // record old x and y values in case the API rejects our update, so we can revert to them
+      var oldX = project.x
+      var oldY = project.y
+      // the map is a percentage width of the overall window, so we need
+      // to save x and y as percentage values.
+      project.x = event.offsetX / this.mapWidth
+      project.y = event.offsetY / this.mapHeight
+      githubIssue.updateProject(project)
+        .catch(err => {
+          console.log('update rejected', err)
+          project.x = oldX
+          project.y = oldY
+        })
+    },
+    updateMapDimensions () {
+      var floorplan = this.$el.querySelector('.floorplan')
+      this.mapWidth = floorplan.clientWidth
+      this.mapHeight = floorplan.clientHeight
     },
     login () {
       githubIssue.ensureAuthenticatedClient().then(data => console.log(data))
@@ -94,6 +120,30 @@ export default {
     logout () {
       this.username = ''
       githubIssue.deauthenticateClient()
+    },
+    toggleEditMode () {
+      if (!this.selectedProject.editMode) { // entering edit mode
+        this.selectedProject.backup = {
+          title: this.selectedProject.title,
+          description: this.selectedProject.description
+        }
+      } else { // cancelling edit mode
+        this.selectedProject.title = this.selectedProject.backup.title
+        this.selectedProject.description = this.selectedProject.backup.description
+      }
+      this.selectedProject.editMode = !this.selectedProject.editMode
+    },
+    updateProject () {
+      githubIssue.updateProject(this.selectedProject)
+        .then(() => {
+          this.selectedProject.editMode = false
+        })
+        .catch(err => {
+          console.log('update rejected', err)
+          var backup = this.selectedProject.backup
+          this.selectedProject.title = backup.title
+          this.selectedProject.description = backup.description
+        })
     }
   },
   components: {
@@ -103,7 +153,8 @@ export default {
   },
   mounted () {
     githubIssue = new GitHubIssueService({
-      organization: 'bkkhack',
+      // organization: 'bkkhack',
+      organization: 'pangaunn',
       repository: 'hackmap',
       label: 'BKKHack Main Thread',
       onAuthenticationRequired: auth.getOAuthToken,

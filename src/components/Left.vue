@@ -4,17 +4,17 @@
       <input v-model="form.title" type="text" placeholder="Topic" autofocus>
       <textarea v-model="form.description" placeholder="More description (optional)"></textarea>
     </div>
-    <button class="glow-button" v-on:click="toggleForm">+ Add your hack</button>
+    <button class="glow-button" @click="toggleForm">+ Add your hack</button>
     <div v-for="project in projects"
-      v-on:dragstart="drag"
-      v-on:click="updateSelectedProject(project)"
+      @dragstart="drag"
+      @click="updateSelectedProject(project)"
       v-bind:key="project.id"
       v-bind:data-id="project.id"
       v-bind:class="{ selected: selectedProject === project }"
       v-bind:draggable="project.username === username"
       v-cloak
       class="project">
-    <img v-bind:src="project.avatar_thumbnail" v-bind:alt="project.username" draggable="false" />
+    <img v-bind:src="project.avatar_thumbnail" width="36" v-bind:alt="project.username" draggable="false" />
     {{project.title}}
     </div>
     <div class="details" v-if="projects.length === 0">
