@@ -22,7 +22,7 @@
 <script>
   export default {
     name: 'right',
-    props: ['selectedProject']
+    props: ['selectedProject', 'username']
   }
 </script>
 

@@ -7,7 +7,7 @@
     <button class="glow-button" v-on:click="toggleForm">+ Add your hack</button>
     <div v-for="project in projects"
       v-on:dragstart="drag"
-      v-on:click="selectedProject = project"
+      v-on:click="updateSelectedProject(project)"
       v-bind:key="project.id"
       v-bind:data-id="project.id"
       v-bind:class="{ selected: selectedProject === project }"
@@ -29,47 +29,18 @@
 </template>
 
 <script>
-  import githubIssue from '../github-issues.js'
   export default {
     name: 'left',
-    props: ['form', 'projects'],
+    props: ['form', 'projects', 'selectedProject', 'username'],
     methods: {
       toggleForm () {
-        if (!this.form.isOpen) {
-          this.form.isOpen = true
-          return
-        }
-        this.form.title = this.form.title.trim()
-        this.form.description = this.form.description.trim()
-
-        if (!this.form.title && !this.form.description) {
-          // empty form, close it.
-          this.form.isOpen = false
-          return
-        } else if (!this.form.title) {
-          // user filled in a description, but not a title
-          alert('Please enter a topic for your project')
-          return
-        } else {
-          // title and optional description provided, save the text
-          githubIssue.postNewProject(this.form)
-            .then(project => {
-              // add the new project and blank the form.
-              this.projects.push(project)
-              this.form.title = ''
-              this.form.description = ''
-            })
-            .catch(err => console.error(err))
-          this.form.isOpen = false
-        }
+        this.$emit('toggleForm')
       },
-      // the drag handler for each project list item.
       drag (event) {
-        console.log(event)
-        var avatar = event.target.querySelector('img')
-        event.dataTransfer.setDragImage(avatar, 20, 20)
-        var projectId = event.target.dataset.id
-        event.dataTransfer.setData('projectId', projectId)
+        this.$emit('drag', event)
+      },
+      updateSelectedProject (project) {
+        this.$emit('updateSelectedProject', project)
       }
     }
   }

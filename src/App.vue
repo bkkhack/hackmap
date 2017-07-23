@@ -1,16 +1,28 @@
 <template>
-  <div>
-    <left :form="form" :projects="projects"></left>
-    <center :helpText="helpText"></center>
-    <right :selectedProject="selectedProject"></right>
+  <div id="appContainer">
+    <left
+      @toggleForm="toggleForm" @updateSelectedProject="updateSelectedProject"
+      :form="form" :projects="projects"
+      :selectedProject="selectedProject" :username="username">
+    </left>
+    <center
+      @login="login" @logout="logout"
+      :helpText="helpText" :username="username">
+    </center>
+    <right
+      :selectedProject="selectedProject" :username="username">
+    </right>
   </div>
 </template>
 
 <script>
+import GitHubIssueService from './github-issues.js'
+import auth from './github-oauth.js'
 import Left from './components/Left.vue'
 import Center from './components/Center.vue'
 import Right from './components/Right.vue'
 
+let githubIssue
 export default {
   name: 'app',
   data () {
@@ -27,14 +39,85 @@ export default {
       authenticationUrl: '',
       username: '',
       selectedProject: {
-        id: ''
+        id: '',
+        avatar: '',
+        username: '',
+        editMode: '',
+        title: '',
+        description: ''
       }
+    }
+  },
+  methods: {
+    toggleForm () {
+      if (!this.form.isOpen) {
+        this.form.isOpen = true
+        return
+      }
+      this.form.title = this.form.title.trim()
+      this.form.description = this.form.description.trim()
+
+      if (!this.form.title && !this.form.description) {
+        // empty form, close it.
+        this.form.isOpen = false
+        return
+      } else if (!this.form.title) {
+        // user filled in a description, but not a title
+        alert('Please enter a topic for your project')
+        return
+      } else {
+        // title and optional description provided, save the text
+        githubIssue.postNewProject(this.form)
+          .then(project => {
+            // add the new project and blank the form.
+            this.projects.push(project)
+            this.form.title = ''
+            this.form.description = ''
+          })
+          .catch(err => console.error(err))
+        this.form.isOpen = false
+      }
+    },
+    drag (event) {
+      console.log(event)
+      // var avatar = event.target.querySelector('img')
+      // event.dataTransfer.setDragImage(avatar, 20, 20)
+      // var projectId = event.target.dataset.id
+      // event.dataTransfer.setData('projectId', projectId)
+    },
+    updateSelectedProject (project) {
+      this.selectedProject = project
+    },
+    login () {
+      githubIssue.ensureAuthenticatedClient().then(data => console.log(data))
+    },
+    logout () {
+      this.username = ''
+      githubIssue.deauthenticateClient()
     }
   },
   components: {
     Left,
     Center,
     Right
+  },
+  mounted () {
+    githubIssue = new GitHubIssueService({
+      organization: 'bkkhack',
+      repository: 'hackmap',
+      label: 'BKKHack Main Thread',
+      onAuthenticationRequired: auth.getOAuthToken,
+      pollIntervalSeconds: 60,
+      onProjectsUpdated: projects => {
+        this.projects = projects
+      },
+      onHelpText: helpText => {
+        this.helpText = helpText
+      },
+      onUserAuthenticated: response => {
+        this.username = response.data.login
+      }
+    })
   }
 }
 </script>
@@ -55,7 +138,7 @@ html {
     background-size:100px 100px, 100px 100px, 20px 20px, 20px 20px;
     background-position:-2px -2px, -2px -2px, -1px -1px, -1px -1px;
 }
-body {
+#appContainer {
     color:#fff;
     font-family:sans-serif;
     display:flex;

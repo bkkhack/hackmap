@@ -16,7 +16,7 @@ import auth from './github-oauth.js'
  *    onProjectsUpdated: (projects) => ()
  * }
  */
-class GitHubIssueService {
+export default class GitHubIssueService {
   constructor (config) {
     this.config = config
     this.github = this.createGithubApiClient(config.organization, config.repository)
@@ -133,20 +133,3 @@ class GitHubIssueService {
     console.log(err)
   }
 }
-
-export default new GitHubIssueService({
-  organization: 'pangaunn',
-  repository: 'hackmap',
-  label: 'BKKHack Main Thread',
-  onAuthenticationRequired: auth.getOAuthToken,
-  pollIntervalSeconds: 60,
-  onProjectsUpdated: projects => {
-    return projects
-  },
-  onHelpText: helpText => {
-    return helpText
-  },
-  onUserAuthenticated: response => {
-    return response.data.login
-  }
-})

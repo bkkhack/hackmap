@@ -64,11 +64,11 @@
         this.mapHeight = floorplan.clientHeight
       },
       login () {
-        githubIssue.ensureAuthenticatedClient()
+        this.$emit('login')
       },
       logout () {
-        this.username = ''
-        githubIssue.deauthenticateClient()
+        console.log('aaaa')
+        this.$emit('logout')
       }
     },
     mounted () {
