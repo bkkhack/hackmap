@@ -27,7 +27,7 @@ model.projects.loading = true;
 
 // encapsulates access to the github issues API
 const githubIssue = new GitHubIssueService({
-    organization: "bkkhack",
+    organization: "pangaunn",
     repository: "hackmap",
     label: "BKKHack Main Thread",
     onAuthenticationRequired: GitHubAuth.getOAuthToken,
