@@ -153,8 +153,7 @@ export default {
   },
   mounted () {
     githubIssue = new GitHubIssueService({
-      // organization: 'bkkhack',
-      organization: 'pangaunn',
+      organization: 'bkkhack',
       repository: 'hackmap',
       label: 'BKKHack Main Thread',
       onAuthenticationRequired: auth.getOAuthToken,

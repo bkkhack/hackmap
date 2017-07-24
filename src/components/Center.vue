@@ -7,7 +7,7 @@
     <div class="droptarget"
       @dragover="dragover"
       @drop="drop">
-    <img src="../assets/images/carmana.svg" class="floorplan" />
+    <img src="/static/carmana.svg" class="floorplan" />
     <img class="marker" width="36"
       v-for="project in projects"
       v-if="project.x"
