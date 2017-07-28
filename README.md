@@ -20,6 +20,10 @@ The following commands are also available:
 
 - `npm run build` -- builds the assets (js, sourcemaps, etc). Source is minified.
 - `npm run lint` -- checking code style according to eslint setup.
+- `deploy-github-pages.sh` -- push what are in dist to gh-pages branch.
+
+Syntax hightlight for editor can found [here](https://github.com/vuejs/awesome-vue#source-code-editing)
+
 
 # Initial Deployment
 
