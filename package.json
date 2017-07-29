@@ -8,6 +8,7 @@
     "dev": "node build/dev-server.js",
     "start": "node build/dev-server.js",
     "build": "node build/build.js",
+    "build:local": "node build/build-local.js",
     "lint": "eslint --ext .js,.vue src"
   },
   "author": "",
