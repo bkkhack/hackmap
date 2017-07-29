@@ -18,7 +18,8 @@ To get started, clone this repo and run:
 
 The following commands are also available:
 
-- `npm run build` -- builds the assets (js, sourcemaps, etc). Source is minified.
+- `npm run build` -- builds the assets (js, sourcemaps, etc). Source is minified. This command will put /hackmack prefix to all static assets (img, js, css).
+- `npm run build:local` -- builds the assets (js, sourcemaps, etc). Source is minified. Use this command if you want to test it on your local.
 - `npm run lint` -- checking code style according to eslint setup.
 - `deploy-github-pages.sh` -- push what are in dist to gh-pages branch.
 
