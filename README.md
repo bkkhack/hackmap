@@ -19,12 +19,10 @@ To get started, clone this repo and run:
 The following commands are also available:
 
 - `npm run build` -- builds the assets (js, sourcemaps, etc). Source is minified. This command will put /hackmack prefix to all static assets (img, js, css).
-- `npm run build:local` -- builds the assets (js, sourcemaps, etc). Source is minified. Use this command if you want to test it on your local.
 - `npm run lint` -- checking code style according to eslint setup.
-- `deploy-github-pages.sh` -- push what are in dist to gh-pages branch.
+- `npm run deploy` -- deploy dist folder to gh-pages branch.
 
 Syntax hightlight for editor can found [here](https://github.com/vuejs/awesome-vue#source-code-editing)
-
 
 # Initial Deployment
 
