@@ -33,4 +33,4 @@ git push -f origin ${TARGET_DEPLOYMENT_BRANCH}:${TARGET_DEPLOYMENT_BRANCH}
 
 # Remove the branch locally as its not needed.
 # Deployment is simplified by re-creating the force pushing the branch
-git branch -D ${TARGET_DEPLOYMENT_BRANCH}
+# git branch -D ${TARGET_DEPLOYMENT_BRANCH}
