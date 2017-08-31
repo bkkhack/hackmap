@@ -14,13 +14,15 @@ The client-side code uses written in ES6, with [Vue.js](https://vuejs.org/) for 
 To get started, clone this repo and run:
 
 1. `npm install` -- downloads development and runtime dependencies.
-2. `npm run watch` -- starts up webpack development webserver to serve the application, monitor changes and rebuild assets on change.
+2. `npm run dev` or `npm start` -- starts up webpack development webserver to serve the application, monitor changes and rebuild assets on change.
 
 The following commands are also available:
 
-- `npm run build` -- builds the assets (js, sourcemaps, etc). Runs `build:dist` if on the gh-pages git branch, `build:dev` otherwise.
-- `npm run build:dev` -- builds in development mode. Source is not minified.
-- `npm run build:dist` -- builds in production mode. Source is minified with dead-code elimination.
+- `npm run build` -- builds the assets (js, sourcemaps, etc). Source is minified. This command will put /hackmack prefix to all static assets (img, js, css).
+- `npm run lint` -- checking code style according to eslint setup.
+- `npm run deploy` -- deploy dist folder to gh-pages branch.
+
+Syntax hightlight for editor can found [here](https://github.com/vuejs/awesome-vue#source-code-editing)
 
 # Initial Deployment
 
