@@ -7,7 +7,7 @@
     <div class="droptarget"
       @dragover="dragover"
       @drop="drop">
-    <img src="../floorplan/herritys2.svg" class="floorplan" />
+    <img src="../floorplan/chula.jpg" class="floorplan" />
     <img class="marker" width="36"
       v-for="project in projects"
       v-if="project.x"
@@ -29,7 +29,7 @@
 <script>
   export default {
     name: 'center',
-    props: ['helpText', 'username', 'projects', 'selectedProject'],
+    props: ['helpText', 'username', 'projects', 'selectedProject', 'mapWidth', 'mapHeight'],
     methods: {
       dragover (event) {
         this.$emit('dragover', event)
@@ -49,18 +49,9 @@
       logout () {
         this.$emit('logout')
       },
-      updateMapDimensions () {
-        var floorplan = this.$el.querySelector('.floorplan')
-        this.mapWidth = floorplan.clientWidth
-        this.mapHeight = floorplan.clientHeight
-      },
       updateSelectedProject (project) {
         this.$emit('updateSelectedProject', project)
       }
-    },
-    mounted () {
-      window.addEventListener('resize', this.updateMapDimensions)
-      this.updateMapDimensions()
     },
     beforeDestroy () {
       window.removeEventListener('resize', this.updateMapDimensions)

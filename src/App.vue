@@ -10,7 +10,9 @@
       @updateSelectedProject="updateSelectedProject"
       @login="login" @logout="logout" @drop="centerDrop"
       :projects="projects" :selectedProject="selectedProject"
-      :helpText="helpText" :username="username">
+      :helpText="helpText" :username="username"
+      :mapWidth="mapWidth" :mapHeight="mapHeight"
+      >
     </center>
     <right
       @toggleEditMode="toggleEditMode" @updateProject="updateProject"
@@ -168,12 +170,21 @@ export default {
         this.username = response.data.login
       }
     })
+    // we need to calculate map dimensions in order to place the avatars
+    // we handle three cases:
+    // if the map loads after this code runs.
+    this.$el.querySelector('.floorplan')
+      .addEventListener('load', this.updateMapDimensions)
+    // if this code runs after the image loads
+    this.updateMapDimensions()
+    // and on resize
+    window.addEventListener('resize', this.updateMapDimensions)
   }
 }
 </script>
 
 <style>
-html, body {
+html, body, #appContainer {
     margin: 0;
     padding: 0;
     height: 100%;
@@ -251,6 +262,7 @@ div[draggable='true'] {
 .side-column {
     padding:10px;
     min-height:550px;
+    overflow-y:auto;
 }
 .center-column {
     order: 2;
@@ -400,12 +412,8 @@ div[draggable='true'] {
 }
 .droptarget {
     width:90%;
-
-    /* vertical center */
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    position:relative;
+    margin:40px auto 0 auto;
 }
 .floorplan {
     /* floorplan image is assumed to be black vector image */
