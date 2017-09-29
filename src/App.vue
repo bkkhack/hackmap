@@ -464,4 +464,9 @@ div[draggable='true'] {
 .selected-project-description {
     white-space: pre-line; /* honor line breaks that the user typed */
 }
+
+/* github avatar resizes -- github stopped respecting the &s parameter
+ * for default generated avatar images, so we manually do it here */
+img[src$="s=40"] { width: 40px; height: 40px; }
+img[src$="s=120"] { width: 120px; height: 120px; }
 </style>
