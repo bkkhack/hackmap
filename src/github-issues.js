@@ -68,15 +68,21 @@ export default class GitHubIssueService {
 
   pollIssueForComments () {
     var commentsUrl = 'issues/' + this.issueNumber + '/comments'
+    var etag
 
     var poll = () => {
       console.log('polling...')
       return this.github.repo
-        .get(commentsUrl)
+        .get(commentsUrl, {
+          // use etag for caching, as described in https://developer.github.com/v3/#conditional-requests
+          headers: etag ? { 'If-None-Match': etag } : { }
+        })
         .then(response => {
-          var projects = response.data
-            .map(serialization.deserializeCommentToProject)
-          this.config.onProjectsUpdated(projects)
+          if (response.status === 200) {
+            etag = response.headers.etag
+            var projects = response.data.map(serialization.deserializeCommentToProject)
+            this.config.onProjectsUpdated(projects)
+          }
         })
         .catch(err => this.reportError(err))
     }
