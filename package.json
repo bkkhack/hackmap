@@ -1,5 +1,6 @@
 {
   "name": "hackmap",
+  "repository": "bkkhack/hackmap",
   "version": "1.0.0",
   "description": "A tool to help collaborate at bkkhack",
   "main": "index.js",
@@ -12,7 +13,7 @@
     "continuous-integration": "CI=true jest",
     "lint": "eslint --ext .js,.vue src"
   },
-  "author": "",
+  "author": "BKKHack Members",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.16.1",
