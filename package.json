@@ -8,7 +8,7 @@
     "dev": "node build/dev-server.js",
     "start": "node build/dev-server.js",
     "build": "node build/build.js",
-    "deploy": "node build/build.js && push-dir --dir=dist --branch=gh-pages --cleanup",
+    "deploy": "node build/build.js && push-dir --dir=dist --branch=gh-pages --remote=upstream --cleanup",
     "test": "jest --watch",
     "continuous-integration": "CI=true jest",
     "lint": "eslint --ext .js,.vue src"
