@@ -4,7 +4,7 @@
       @toggleForm="toggleForm" @updateSelectedProject="updateSelectedProject"
       @drag="leftDrag"
       :form="form" :projects="projects"
-      :selectedProject="selectedProject" :username="username">
+      :selectedProject="selectedProject" :username="username" :isHasIssue="isHasIssue">
     </left>
     <center
       @updateSelectedProject="updateSelectedProject"
@@ -44,6 +44,8 @@ export default {
       },
       authenticationUrl: '',
       username: '',
+      userId: '',
+      isHasIssue: false,
       selectedProject: {
         id: '',
         avatar: '',
@@ -162,12 +164,17 @@ export default {
       pollIntervalSeconds: 60,
       onProjectsUpdated: projects => {
         this.projects = projects
+        const loggingInUserComment = this.projects.find(comment => comment.userId === this.userId)
+        if (loggingInUserComment !== undefined) {
+          this.isHasIssue = true
+        }
       },
       onHelpText: helpText => {
         this.helpText = helpText
       },
       onUserAuthenticated: response => {
         this.username = response.data.login
+        this.userId = response.data.id
       }
     })
     // we need to calculate map dimensions in order to place the avatars
@@ -308,6 +315,11 @@ div[draggable='true'] {
 }
 .glow-button:active {
     color: #6af;
+}
+.glow-button.disabled {
+    border: 2px dashed #6384b7 !important;
+    color: #6384b7 !important;
+    cursor: default !important;
 }
 @keyframes glow-button {
     from { color: #326fce; border-color: #326fce }

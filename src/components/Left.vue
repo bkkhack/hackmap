@@ -4,7 +4,10 @@
       <input v-model="form.title" type="text" placeholder="Topic" autofocus>
       <textarea v-model="form.description" placeholder="More description (optional)"></textarea>
     </div>
-    <button class="glow-button" @click="toggleForm">+ Add your hack</button>
+
+    <button v-if="isHasIssue" disabled="true" class="glow-button disabled" title="You already had a hack." @click="toggleForm">+ Add your hack</button>
+    <button v-else class="glow-button" @click="toggleForm">+ Add your hack</button>
+
     <div v-for="project in projects"
       @dragstart="drag"
       @click="updateSelectedProject(project)"
@@ -31,7 +34,7 @@
 <script>
   export default {
     name: 'left',
-    props: ['form', 'projects', 'selectedProject', 'username'],
+    props: ['form', 'projects', 'selectedProject', 'username', 'isHasIssue'],
     methods: {
       toggleForm () {
         this.$emit('toggleForm')

@@ -21,6 +21,7 @@ export default {
       title: textLines[0],
       description: textLines[1],
       username: comment.user.login,
+      userId: comment.user.id,
       avatar_thumbnail: comment.user.avatar_url + '&s=' + 40,
       avatar: comment.user.avatar_url + '&s=' + 120,
       x: coords.x,
