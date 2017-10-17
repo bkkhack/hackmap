@@ -76,6 +76,14 @@ export default class GitHubIssueService {
       })
   }
 
+  deleteProject (id) {
+    return this.ensureAuthenticatedClient()
+      .then(() => {
+        return this.github.repo
+          .delete('issues/comments/' + id)
+      })
+  }
+
   pollIssueForComments () {
     var commentsUrl = 'issues/' + this.issueNumber + '/comments'
     var etag

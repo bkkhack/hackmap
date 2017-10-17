@@ -15,7 +15,7 @@
       >
     </center>
     <right
-      @toggleEditMode="toggleEditMode" @updateProject="updateProject"
+      @toggleEditMode="toggleEditMode" @updateProject="updateProject" @deleteProject="deleteProject"
       :selectedProject="selectedProject" :username="username">
     </right>
   </div>
@@ -153,6 +153,21 @@ export default {
           var backup = this.selectedProject.backup
           this.selectedProject.title = backup.title
           this.selectedProject.description = backup.description
+        })
+    },
+    deleteProject (id) {
+      githubIssue.deleteProject(id)
+        .then(() => {
+          this.selectedProject = {
+            id: '',
+            avatar: '',
+            username: '',
+            editMode: '',
+            title: '',
+            description: ''
+          }
+          const indexResult = this.projects.findIndex(project => project.id === id)
+          this.projects.splice(indexResult, 1)
         })
     }
   },
@@ -294,6 +309,9 @@ div[draggable='true'] {
     order: 3;
     text-align:center;
     padding-top:60px;
+}
+.details.side-column {
+  position: relative;
 }
 
 
@@ -477,8 +495,17 @@ div[draggable='true'] {
 .edit-button {
     position:absolute;
     top:0;
+    left:0;
+    padding:10px;
+}
+.delete-button {
+    position:absolute;
+    top:0;
     right:0;
     padding:10px;
+}
+.delete-button:hover {
+    color: red !important;
 }
 .selected-project-description {
     white-space: pre-line; /* honor line breaks that the user typed */
