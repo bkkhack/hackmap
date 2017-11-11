@@ -6,14 +6,15 @@ Vue.use(Router)
 
 export default new Router({
   mode: 'history',
+  base: window.location.pathname,
   routes: [
     {
-      path: '/',
+      path: '',
       name: 'lastest',
       component: Hackmap
     },
     {
-      path: '/:issueNumber',
+      path: ':issueNumber',
       name: 'history',
       component: Hackmap,
       props: true
