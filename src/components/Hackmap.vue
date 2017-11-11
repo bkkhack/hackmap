@@ -213,7 +213,7 @@ export default {
 </script>
 
 <style>
-html, body, #appContainer {
+html, body, #app, #appContainer {
     margin: 0;
     padding: 0;
     height: 100%;
