@@ -12,7 +12,7 @@ describe('baseURL', () => {
 
 let token = 'token'
 let config = {
-  organization: 'saiqulhaq',
+  organization: 'bkkhack',
   repository: 'hackmap',
 }
 

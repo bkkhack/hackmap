@@ -50,7 +50,10 @@ export default class GitHubIssueService {
         this.issueNumber = issue.number
       })
       .then(() => this.pollIssueForComments())
-      .catch(err => this.reportError(err))
+      .catch(err => {
+        this.reportError(err)
+        config.onError(err)
+      })
   }
 
   postNewProject (project) {
