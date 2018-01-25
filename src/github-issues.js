@@ -1,6 +1,6 @@
-import axios from 'axios' // ajax library
 import serialization from './github-serialization.js'
 import auth from './github-oauth.js'
+import githubApiClient from './github-api-client.js'
 
 /*
  * GitHub Issues API. Handles saving and polling of
@@ -19,7 +19,7 @@ import auth from './github-oauth.js'
 export default class GitHubIssueService {
   constructor (config) {
     this.config = config
-    this.github = this.createGithubApiClient(config.organization, config.repository)
+    this.github = githubApiClient(config.organization, config.repository)
 
     // if the user has already logged in (e.g. in a previous session), use the
     // authenticated client for all operations. Authenticated calls have a
@@ -113,7 +113,7 @@ export default class GitHubIssueService {
     return this.config.onAuthenticationRequired()
       .then(token => {
         if (!this.github.isAuthenticated) {
-          this.github = this.createGithubApiClient(
+          this.github = githubApiClient(
             this.config.organization,
             this.config.repository,
             token)
@@ -129,28 +129,9 @@ export default class GitHubIssueService {
 
   deauthenticateClient () {
     auth.logOut()
-    this.github = this.createGithubApiClient(
+    this.github = githubApiClient(
       this.config.organization,
       this.config.repository)
-  }
-
-  createGithubApiClient (org, repo, token) {
-    function getApiConfig (apiPath) {
-      var config = {
-        baseURL: 'https://api.github.com/' + (apiPath || '')
-      }
-      if (token) {
-        config.headers = { 'Authorization': 'token ' + token }
-      }
-      return config
-    }
-    // general github ajax client
-    var github = axios.create(getApiConfig())
-
-    // repo-specific ajax client
-    github.repo = axios.create(getApiConfig(`repos/${org}/${repo}/`))
-
-    return github
   }
 
   reportError (err) {
