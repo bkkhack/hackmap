@@ -169,6 +169,13 @@ export default {
           const indexResult = this.projects.findIndex(project => project.id === id)
           this.projects.splice(indexResult, 1)
         })
+    },
+    notifyError (msg) {
+      if (msg.hasOwnProperty('message')) {
+        alert(msg.message)
+      } else {
+        alert('Oh no, something went wrong')
+      }
     }
   },
   components: {
@@ -197,7 +204,10 @@ export default {
         this.username = response.data.login
         this.userId = response.data.id
       },
-      issueNumber: this.issueNumber
+      issueNumber: this.issueNumber,
+      onError: errMsg => {
+        this.notifyError(errMsg)
+      }
     })
     // we need to calculate map dimensions in order to place the avatars
     // we handle three cases:
