@@ -207,7 +207,7 @@ export default {
         this.username = response.data.login
         this.userId = response.data.id
       },
-      issueNumber: '38', // this.issueNumber,
+      issueNumber: this.issueNumber,
       onError: errMsg => {
         this.notifyError(errMsg)
       },
