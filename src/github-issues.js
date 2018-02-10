@@ -81,7 +81,7 @@ export default class GitHubIssueService {
           .post('issues/' + this.issueNumber + '/comments', { body: body })
       })
       .then((response) => {
-        return serialization.deserializeCommentToProject(response)
+        return serialization.deserializeCommentToProject(response.data)
       })
   }
 
@@ -92,7 +92,7 @@ export default class GitHubIssueService {
         return this.github.repo.patch('issues/comments/' + project.id, { body: body })
       })
       .then(response => {
-        return serialization.deserializeCommentToProject(response)
+        return serialization.deserializeCommentToProject(response.data)
       })
   }
 
