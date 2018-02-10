@@ -12,8 +12,9 @@ import githubApiClient from './github-api-client.js'
  *    repository: 'hackmap',
  *    label: 'BKKHack Main Thread',
  *    pollIntervalSeconds: 60,
- *    onAuthenticationRequired: () => Promise(token)
- *    onProjectsUpdated: (projects) => ()
+ *    onAuthenticationRequired: () => Promise(token),
+ *    onProjectsUpdated: (projects) => {},
+ *    onError: (error) => {}
  * }
  */
 export default class GitHubIssueService {
@@ -30,30 +31,41 @@ export default class GitHubIssueService {
 
     // issue ajax requests to load data from github
     // the model will be updated periodically from the callbacks
-    this.github.repo.get('issues', { params: { labels: this.config.label } })
-      .then(issueResponse => {
-        if (!issueResponse.data.length) {
-          throw new Error('Could not find an open issue labeled: ' + this.config.label)
-        }
-
-        let issue
-        if (this.config.issueNumber === '') {
-          issue = issueResponse.data[0]
-        } else {
-          issue = issueResponse.data.find(i => i.number === parseInt(this.config.issueNumber))
-          if (issue === undefined) {
-            throw new Error(`Could not find an open issue labeled: ${this.config.label} and numbered: ${this.config.issueNumber}`)
-          }
-        }
-
-        config.onHelpText(issue.body)
-        this.issueNumber = issue.number
-      })
+    this.getIssues()
+      .then((issues) => { this.getMainThread(issues) } )
       .then(() => this.pollIssueForComments())
-      .catch(err => {
+      .catch((err) => {
         this.reportError(err)
-        config.onError(err)
+        this.config.onError(err)
       })
+  }
+
+  /**
+   * @returns {Promise}
+   */
+  getIssues() {
+    return this.github.repo.get('issues', { params: { labels: this.config.label } })
+                           .then((response) => response.data)
+                           .catch((err) => { throw new Error('Unable get issues data') })
+  }
+
+  getMainThread(issues) {
+    if (!issues.length) {
+      throw new Error('Could not find an open issue labeled: ' + this.config.label)
+    }
+
+    let issue
+    if (this.config.issueNumber === '') {
+      issue = issues
+    } else {
+      issue = issues.find(i => i.number === parseInt(this.config.issueNumber))
+      if (issue === undefined) {
+        throw new Error(`Could not find an open issue labeled: ${this.config.label} and numbered: ${this.config.issueNumber}`)
+      }
+    }
+
+    this.config.onHelpText(issue.body)
+    this.issueNumber = issue.number
   }
 
   postNewProject (project) {
@@ -64,7 +76,7 @@ export default class GitHubIssueService {
           .post('issues/' + this.issueNumber + '/comments', { body: body })
       })
       .then((response) => {
-        return serialization.deserializeCommentToProject(response.data)
+        return serialization.deserializeCommentToProject(issues)
       })
   }
 
@@ -75,7 +87,7 @@ export default class GitHubIssueService {
         return this.github.repo.patch('issues/comments/' + project.id, { body: body })
       })
       .then(response => {
-        return serialization.deserializeCommentToProject(response.data)
+        return serialization.deserializeCommentToProject(issues)
       })
   }
 
@@ -92,7 +104,6 @@ export default class GitHubIssueService {
     var etag
 
     var poll = () => {
-      console.log('polling...')
       return this.github.repo
         .get(commentsUrl, {
           // use etag for caching, as described in https://developer.github.com/v3/#conditional-requests
@@ -105,10 +116,20 @@ export default class GitHubIssueService {
             this.config.onProjectsUpdated(projects)
           }
         })
-        .catch(err => this.reportError(err))
+        .catch(err => {
+          this.reportError(err)
+          this.config.onError(new Error('Failed retrieving ideas'))
+        })
     }
 
-    window.setInterval(poll, 1000 * this.config.pollIntervalSeconds)
+    if (process.env['NODE_ENV'] !== 'test') {
+      let interval = 1000 * this.config.pollIntervalSeconds
+      window.setInterval(() => {
+        console.log('...')
+        poll()
+      }, interval)
+    }
+    console.log('start polling')
     return poll()
   }
 
@@ -138,6 +159,8 @@ export default class GitHubIssueService {
   }
 
   reportError (err) {
-    console.log(err)
+    if (process.env['NODE_ENV'] !== 'test') {
+      console.error(err)
+    }
   }
 }

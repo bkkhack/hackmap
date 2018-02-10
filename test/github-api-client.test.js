@@ -1,6 +1,6 @@
-const axios = require('axios');
-const MockAdapter = require('axios-mock-adapter');
-const mock = new MockAdapter(axios);
+const axios = require('axios')
+const MockAdapter = require('axios-mock-adapter')
+const mock = new MockAdapter(axios)
 
 import GithubApiClient, { baseURL } from '../src/github-api-client.js'
 
@@ -23,7 +23,7 @@ describe('GithubApiClient()', () => {
 
     mock.onGet().reply(function(config) {
       return [200, {}]
-    });
+    })
   })
 
   it('returns axios instance for general repo', () => {
