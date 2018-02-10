@@ -26,7 +26,8 @@ let validConfig = () => {
     pollIntervalSeconds: 1,
     onAuthenticationRequired: () => {},
     onProjectsUpdated: () => {},
-    onError: (error) => {}
+    onError: (error) => {},
+    onInit: () => {}
   }
 }
 
@@ -97,6 +98,16 @@ describe('GitHubIssueService', () => {
       let cfg = validConfig()
       cfg.onHelpText = (msg) => {
         expect(msg).toEqual(expectedIssue.body)
+        done()
+      }
+      instance(cfg)
+    })
+  })
+
+  describe('.onInit callback ', () => {
+    it('will be fired when starting the service', (done) => {
+      let cfg = validConfig()
+      cfg.onInit = () => {
         done()
       }
       instance(cfg)

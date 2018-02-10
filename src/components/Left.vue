@@ -20,13 +20,14 @@
     <img v-bind:src="project.avatar_thumbnail" width="36" v-bind:alt="project.username" draggable="false" />
     {{project.title}}
     </div>
-    <div class="details" v-if="projects.length === 0">
-      No hacks yet! You can be first!
+    <div class="details" v-if="state === 'running' && projects.length === 0">
+      <p>No hacks yet! You can be first!</p>
     </div>
-    <div class="loader" v-if="projects.loading">
+    <div class="loader" v-if="state === 'init'">
       <div class="loader1"></div>
       <div class="loader2"></div>
       <div class="loader3"></div>
+      <p>No comments because we're loading</p>
     </div>
   </div>
 </template>
@@ -34,7 +35,7 @@
 <script>
   export default {
     name: 'left',
-    props: ['form', 'projects', 'selectedProject', 'username', 'isHasIssue'],
+    props: ['form', 'projects', 'selectedProject', 'username', 'isHasIssue', 'state'],
     methods: {
       toggleForm () {
         this.$emit('toggleForm')

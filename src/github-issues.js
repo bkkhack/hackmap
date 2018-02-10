@@ -29,10 +29,12 @@ export default class GitHubIssueService {
       this.ensureAuthenticatedClient()
     }
 
+    this.config.onInit()
+
     // issue ajax requests to load data from github
     // the model will be updated periodically from the callbacks
     this.getIssues()
-      .then((issues) => { this.getMainThread(issues) } )
+      .then((issues) => { this.getMainThread(issues) })
       .then(() => this.pollIssueForComments())
       .catch((err) => {
         this.reportError(err)
@@ -43,13 +45,16 @@ export default class GitHubIssueService {
   /**
    * @returns {Promise}
    */
-  getIssues() {
+  getIssues () {
     return this.github.repo.get('issues', { params: { labels: this.config.label } })
                            .then((response) => response.data)
-                           .catch((err) => { throw new Error('Unable get issues data') })
+                           .catch((err) => {
+                             this.reportError(err)
+                             throw new Error('Unable get issues data')
+                           })
   }
 
-  getMainThread(issues) {
+  getMainThread (issues) {
     if (!issues.length) {
       throw new Error('Could not find an open issue labeled: ' + this.config.label)
     }
@@ -76,7 +81,7 @@ export default class GitHubIssueService {
           .post('issues/' + this.issueNumber + '/comments', { body: body })
       })
       .then((response) => {
-        return serialization.deserializeCommentToProject(issues)
+        return serialization.deserializeCommentToProject(response)
       })
   }
 
@@ -87,7 +92,7 @@ export default class GitHubIssueService {
         return this.github.repo.patch('issues/comments/' + project.id, { body: body })
       })
       .then(response => {
-        return serialization.deserializeCommentToProject(issues)
+        return serialization.deserializeCommentToProject(response)
       })
   }
 
