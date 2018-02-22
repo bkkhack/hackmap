@@ -62,6 +62,28 @@ build
 └── build scripts for webpack, from https://github.com/vuejs-templates/webpack
 ```
 
+## Testing Authentication
+
+When authenticating with GitHub, GitHub will check the referring URL, and it must match exactly with the URL configured for the OAuth integration. The URL configured for hackmap is `https://bkkhack.github.io/hackmap/` (unfortunately, GitHub does not support multiple URLs). This means that you cannot test authentication on `http://localhost:8080/hackmap/`, the URL that the webpack dev server uses. This can be fixed with a hosts file entry and proxying port 8080 to port 80. See the OS-specific guides below.
+
+#### Debian/Ubuntu
+
+First, add an entry in your hosts file to map 127.0.0.1 to bkkhack.github.io:
+
+```
+127.0.0.1       bkkhack.github.io
+```
+
+Second, enable the nginx configuration included in the repository. It will proxy port 8080 to port 80, and use a self-signed cert.
+
+```
+> cd /etc/nginx/sites-enabled/
+> sudo ln -s ~/path/to/hackmap/config/nginx-bkkhack-config 
+> sudo service nginx reload
+```
+
+Now, after starting the webpack development webserver, navigating to https://bkkhack.github.io/hackmap/ and accepting the self-signed cert, you should be able to access your code and test authentication.
+
 ## Initial Deployment
 
 1. For GitHub authentication, create a GitHub app. You will receive a client id and a secret token.
