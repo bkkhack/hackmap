@@ -1,0 +1,10 @@
+server {
+    listen   443 ssl;
+    server_name  bkkhack.github.io;
+    ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
+    ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
+    location / {
+        proxy_pass http://0.0.0.0:8080;
+        include /etc/nginx/proxy_params;
+    }
+}

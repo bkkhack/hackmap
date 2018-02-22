@@ -63,7 +63,11 @@ app.use(hotMiddleware)
 var staticPath = path.posix.join(config.dev.assetsPublicPath, config.dev.assetsSubDirectory)
 app.use(staticPath, express.static('./static'))
 
-var uri = 'http://localhost:' + port
+// serve under hackmap prefix, like github pages does in prod
+var hackmapUrl = '/hackmap'
+app.use(hackmapUrl, express.static('.'))
+
+var uri = 'http://localhost:' + port + hackmapUrl
 
 var _resolve
 var readyPromise = new Promise(resolve => {
