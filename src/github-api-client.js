@@ -5,7 +5,8 @@ export const baseURL = 'https://api.github.com/'
 export default function (org, repo, token) {
   function getApiConfig (apiPath) {
     var config = {
-      baseURL: baseURL + (apiPath || '')
+      baseURL: baseURL + (apiPath || ''),
+      validateStatus: status => status >= 200 && (status < 300 || status === 304)
     }
     if (token) {
       config.headers = { 'Authorization': 'token ' + token }
