@@ -27,10 +27,9 @@ export default class GitHubIssueService {
     // authenticated client for all operations. Authenticated calls have a
     // higher rate limit, even for calls that don't require authentication
     if (auth.isLoggedIn()) {
-      this.ensureAuthenticatedClient().then(this.startPolling)
-    } else {
-      this.startPolling()
+      this.ensureAuthenticatedClient()
     }
+    this.startPolling()
   }
 
   startPolling () {
