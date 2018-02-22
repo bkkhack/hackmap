@@ -3,6 +3,7 @@
     <left
       @toggleForm="toggleForm" @updateSelectedProject="updateSelectedProject"
       @drag="leftDrag"
+      :state="state"
       :form="form" :projects="projects"
       :selectedProject="selectedProject" :username="username" :isHasIssue="isHasIssue">
     </left>
@@ -39,6 +40,7 @@ export default {
   },
   data () {
     return {
+      state: '',
       helpText: '',
       projects: [],
       mapWidth: 0,
@@ -191,6 +193,7 @@ export default {
       onAuthenticationRequired: auth.getOAuthToken,
       pollIntervalSeconds: 60,
       onProjectsUpdated: projects => {
+        this.$set(this.$data, 'state', 'running')
         this.projects = projects
         const loggingInUserComment = this.projects.find(comment => comment.userId === this.userId)
         if (loggingInUserComment !== undefined) {
@@ -207,6 +210,9 @@ export default {
       issueNumber: this.issueNumber,
       onError: errMsg => {
         this.notifyError(errMsg)
+      },
+      onInit: () => {
+        this.$set(this.$data, 'state', 'init')
       }
     })
     // we need to calculate map dimensions in order to place the avatars
