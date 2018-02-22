@@ -20,17 +20,20 @@ import githubApiClient from './github-api-client.js'
 export default class GitHubIssueService {
   constructor (config) {
     this.config = config
+    this.config.onInit()
     this.github = githubApiClient(config.organization, config.repository)
 
     // if the user has already logged in (e.g. in a previous session), use the
     // authenticated client for all operations. Authenticated calls have a
     // higher rate limit, even for calls that don't require authentication
     if (auth.isLoggedIn()) {
-      this.ensureAuthenticatedClient()
+      this.ensureAuthenticatedClient().then(this.startPolling)
+    } else {
+      this.startPolling()
     }
+  }
 
-    this.config.onInit()
-
+  startPolling () {
     // issue ajax requests to load data from github
     // the model will be updated periodically from the callbacks
     this.getIssues()
@@ -61,7 +64,7 @@ export default class GitHubIssueService {
 
     let issue
     if (this.config.issueNumber === '') {
-      issue = issues
+      issue = issues[0]
     } else {
       issue = issues.find(i => i.number === parseInt(this.config.issueNumber))
       if (issue === undefined) {
@@ -109,6 +112,9 @@ export default class GitHubIssueService {
     var etag
 
     var poll = () => {
+      if (window.document.hidden) {
+        return Promise.resolve()
+      }
       return this.github.repo
         .get(commentsUrl, {
           // use etag for caching, as described in https://developer.github.com/v3/#conditional-requests
