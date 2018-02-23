@@ -64,22 +64,44 @@ build
 
 ## Testing Authentication
 
-When authenticating with GitHub, GitHub will check the referring URL, and it must match exactly with the URL configured for the OAuth integration. The URL configured for hackmap is `https://bkkhack.github.io/hackmap/` (unfortunately, GitHub does not support multiple URLs). This means that you cannot test authentication on `http://localhost:8080/hackmap/`, the URL that the webpack dev server uses. This can be fixed with a hosts file entry and proxying port 8080 to port 80. See the OS-specific guides below.
+When authenticating with GitHub, GitHub will check the referring URL, and it must match exactly with the URL configured for the OAuth integration. The URL configured for hackmap is `https://bkkhack.github.io/hackmap/` (note the trailing slash!). This means that you cannot test authentication on `http://localhost:8080/hackmap/`, the URL that the webpack dev server uses. This can be fixed in 2 steps: adding a hosts file entry and reverse proxying port 8080 to port 80:
 
-#### Debian/Ubuntu
+#### Hosts file entry
 
-First, add an entry in your hosts file to map 127.0.0.1 to bkkhack.github.io:
+Add a line in your hosts file (Linux and Mac OS: `/etc/hosts`; Windows: `C:\Windows\System32\drivers\etc\hosts`) to map 127.0.0.1 to bkkhack.github.io:
 
 ```
 127.0.0.1       bkkhack.github.io
 ```
 
-Second, enable the nginx configuration included in the repository. It will proxy port 8080 to port 80, and use a self-signed cert.
+#### Reverse proxy set up
+
+##### Windows
+
+Use IIS to set up a [reverse proxy with SSL offloading](https://blogs.msdn.microsoft.com/friis/2016/08/25/setup-iis-with-url-rewrite-as-a-reverse-proxy-for-real-world-apps/).
+
+##### Mac OS / Debian / Ubuntu
+
+Enable the nginx configuration included in the repository. It will proxy port 8080 to port 80, and use a self-signed cert.
+
+For **Debian or Ubuntu**, you can simply enable the nginx configuration:
 
 ```
+# debian / ubuntu instructions
 > cd /etc/nginx/sites-enabled/
-> sudo ln -s ~/path/to/hackmap/config/nginx-bkkhack-config 
+> sudo ln -s ~/path/to/hackmap/config/nginx-bkkhack-linux
 > sudo service nginx reload
+```
+
+For **Mac OS**, if you installed nginx using homebrew, the default nginx config (`/usr/local/etc/nginx/nginx.conf`) sets up an empty website on port 8080, so you'll want to disable that so it doesn't conflict with the webpack dev server. You'll also need to generate your own OpenSSL certificate:
+
+```
+# mac os instructions
+> sudo openssl genrsa -out /usr/local/etc/openssl/private/localhost-hackmap.key 2048
+> sudo openssl req -new -x509 -key /usr/local/etc/openssl/private/localhost-hackmap.key -out /usr/local/etc/openssl/certs/localhost-hackmap.crt -days 3650 -subj /CN=bkkhack.github.io
+> cd /usr/local/etc/nginx/servers/
+> sudo ln -s ~/path/to/hackmap/config/nginx-bkkhack-macos
+> sudo nginx -s reload || sudo nginx
 ```
 
 Now, after starting the webpack development webserver, navigating to https://bkkhack.github.io/hackmap/ and accepting the self-signed cert, you should be able to access your code and test authentication.
