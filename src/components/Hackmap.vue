@@ -5,7 +5,7 @@
       @drag="leftDrag"
       :state="state"
       :form="form" :projects="projects"
-      :selectedProject="selectedProject" :username="username" :isHasIssue="isHasIssue">
+      :selectedProject="selectedProject" :username="username" :userAlreadyHasProject="userAlreadyHasProject">
     </left>
     <center
       @updateSelectedProject="updateSelectedProject"
@@ -48,19 +48,20 @@ export default {
       form: {
         isOpen: false,
         title: '',
-        description: ''
+        descriptionText: ''
       },
       authenticationUrl: '',
       username: '',
       userId: '',
-      isHasIssue: false,
+      userAlreadyHasProject: false,
       selectedProject: {
         id: '',
         avatar: '',
         username: '',
         editMode: '',
         title: '',
-        description: ''
+        descriptionHtml: '',
+        descriptionText: ''
       }
     }
   },
@@ -71,9 +72,9 @@ export default {
         return
       }
       this.form.title = this.form.title.trim()
-      this.form.description = this.form.description.trim()
+      this.form.descriptionText = this.form.descriptionText.trim()
 
-      if (!this.form.title && !this.form.description) {
+      if (!this.form.title && !this.form.descriptionText) {
         // empty form, close it.
         this.form.isOpen = false
         return
@@ -88,7 +89,7 @@ export default {
             // add the new project and blank the form.
             this.projects.push(project)
             this.form.title = ''
-            this.form.description = ''
+            this.form.descriptionText = ''
           })
           .catch(err => console.error(err))
         this.form.isOpen = false
@@ -137,24 +138,25 @@ export default {
       if (!this.selectedProject.editMode) { // entering edit mode
         this.selectedProject.backup = {
           title: this.selectedProject.title,
-          description: this.selectedProject.description
+          descriptionText: this.selectedProject.descriptionText
         }
       } else { // cancelling edit mode
         this.selectedProject.title = this.selectedProject.backup.title
-        this.selectedProject.description = this.selectedProject.backup.description
+        this.selectedProject.descriptionText = this.selectedProject.backup.descriptionText
       }
       this.selectedProject.editMode = !this.selectedProject.editMode
     },
     updateProject () {
       githubIssue.updateProject(this.selectedProject)
-        .then(() => {
+        .then(updatedProject => {
+          this.selectedProject = updatedProject
           this.selectedProject.editMode = false
         })
         .catch(err => {
           console.log('update rejected', err)
           var backup = this.selectedProject.backup
           this.selectedProject.title = backup.title
-          this.selectedProject.description = backup.description
+          this.selectedProject.descriptionText = backup.descriptionText
         })
     },
     deleteProject (id) {
@@ -166,8 +168,9 @@ export default {
             username: '',
             editMode: '',
             title: '',
-            description: ''
+            descriptionText: ''
           }
+          this.userAlreadyHasProject = false
           const indexResult = this.projects.findIndex(project => project.id === id)
           this.projects.splice(indexResult, 1)
         })
@@ -197,7 +200,7 @@ export default {
         this.projects = projects
         const loggingInUserComment = this.projects.find(comment => comment.userId === this.userId)
         if (loggingInUserComment !== undefined) {
-          this.isHasIssue = true
+          this.userAlreadyHasProject = true
         }
       },
       onHelpText: helpText => {
@@ -358,9 +361,9 @@ div[draggable='true'] {
     color: #6af;
 }
 .glow-button.disabled {
-    border: 2px dashed #6384b7 !important;
-    color: #6384b7 !important;
-    cursor: default !important;
+    border: 2px dashed #6384b7;
+    color: #6384b7;
+    cursor: default;
 }
 @keyframes glow-button {
     from { color: #326fce; border-color: #326fce }
@@ -521,10 +524,10 @@ div[draggable='true'] {
     padding:10px;
 }
 .delete-button:hover {
-    color: red !important;
+    color: red;
 }
 .selected-project-description {
-    white-space: pre-line; /* honor line breaks that the user typed */
+    text-align:left;
 }
 
 /* github avatar resizes -- github stopped respecting the &s parameter

@@ -13,13 +13,21 @@ function parseCoordinatesFromComment (commentLines) {
 }
 
 export default {
+
+  commentFormat: { 'Accept': 'application/vnd.github.VERSION.full+json' },
+
   deserializeCommentToProject: function (comment) {
     var textLines = comment.body.split('\r\n')
     var coords = parseCoordinatesFromComment(textLines)
+    // title is the first line, description is everything after the first line
+    var title = textLines[0]
+    var descriptionText = textLines.length >= 1 ? textLines[1].trim() : ''
+    var descriptionHtml = comment.body_html.substring(comment.body_html.indexOf('\n')).trim()
     return {
       id: comment.id,
-      title: textLines[0],
-      description: textLines[1],
+      title: title,
+      descriptionText: descriptionText,
+      descriptionHtml: descriptionHtml,
       username: comment.user.login,
       userId: comment.user.id,
       avatar_thumbnail: comment.user.avatar_url + '&s=' + 40,
@@ -32,7 +40,7 @@ export default {
 
   serializeProjectToComment: function (project) {
     let body = project.title + '\r\n' +
-      (project.description || '') + '\r\n' +
+      (project.descriptionText || '') + '\r\n' +
       `<!-- ${project.x},${project.y} -->`
     return body
   }
