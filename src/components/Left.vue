@@ -2,10 +2,10 @@
   <div class="projects side-column">
     <div class="project-form" v-bind:class="{ open: form.isOpen }">
       <input v-model="form.title" type="text" placeholder="Topic" autofocus>
-      <textarea v-model="form.description" placeholder="More description (optional)"></textarea>
+      <textarea v-model="form.descriptionText" placeholder="Details (optional, uses markdown)"></textarea>
     </div>
 
-    <button v-if="isHasIssue" disabled="true" class="glow-button disabled" title="You already had a hack." @click="toggleForm">+ Add your hack</button>
+    <button v-if="userAlreadyHasProject" disabled="true" class="glow-button disabled" title="You've already added a hack!" @click="toggleForm">+ Add your hack</button>
     <button v-else class="glow-button" @click="toggleForm">+ Add your hack</button>
 
     <div v-for="project in projects"
@@ -35,7 +35,7 @@
 <script>
   export default {
     name: 'left',
-    props: ['form', 'projects', 'selectedProject', 'username', 'isHasIssue', 'state'],
+    props: ['form', 'projects', 'selectedProject', 'username', 'userAlreadyHasProject', 'state'],
     methods: {
       toggleForm () {
         this.$emit('toggleForm')

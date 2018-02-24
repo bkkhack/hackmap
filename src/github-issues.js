@@ -81,7 +81,11 @@ export default class GitHubIssueService {
       .then(() => {
         let body = serialization.serializeProjectToComment(project)
         return this.github.repo
-          .post('issues/' + this.issueNumber + '/comments', { body: body })
+          .post('issues/' + this.issueNumber + '/comments', {
+            body: body
+          }, {
+            headers: serialization.commentFormat
+          })
       })
       .then((response) => {
         return serialization.deserializeCommentToProject(response.data)
@@ -92,7 +96,12 @@ export default class GitHubIssueService {
     return this.ensureAuthenticatedClient()
       .then(() => {
         let body = serialization.serializeProjectToComment(project)
-        return this.github.repo.patch('issues/comments/' + project.id, { body: body })
+        return this.github.repo
+          .patch('issues/comments/' + project.id, {
+            body: body
+          }, {
+            headers: serialization.commentFormat
+          })
       })
       .then(response => {
         return serialization.deserializeCommentToProject(response.data)
@@ -117,8 +126,11 @@ export default class GitHubIssueService {
       }
       return this.github.repo
         .get(commentsUrl, {
-          // use etag for caching, as described in https://developer.github.com/v3/#conditional-requests
-          headers: etag ? { 'If-None-Match': etag } : { }
+          headers: Object.assign(
+            serialization.commentFormat,
+            // use etag for caching, as described in https://developer.github.com/v3/#conditional-requests
+            etag ? { 'If-None-Match': etag } : { }
+          )
         })
         .then(response => {
           if (response.status === 200) {

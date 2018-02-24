@@ -7,11 +7,11 @@
       <p><a v-bind:href="'https://github.com/' + selectedProject.username">@{{selectedProject.username}}</a> is hacking on:</p>
       <template v-if="!selectedProject.editMode">
         <h2>{{selectedProject.title}}</h2>
-        <p class='selected-project-description'>{{selectedProject.description}}</p>
+        <p class='selected-project-description' v-html="selectedProject.descriptionHtml"></p>
       </template>
       <template v-else>
         <input v-model="selectedProject.title" type="text" autofocus>
-        <textarea v-model="selectedProject.description"></textarea>
+        <textarea v-model="selectedProject.descriptionText"></textarea>
         <button class="glow-button" @click="updateProject">Update</button>
       </template>
     </template>
