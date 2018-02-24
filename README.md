@@ -1,22 +1,32 @@
-# BKKHackMap &nbsp; [![Build Status](https://travis-ci.org/bkkhack/hackmap.svg?branch=master)](https://travis-ci.org/bkkhack/hackmap)
+# BKKHackMap &nbsp; [![Build Status][build badge]][build link] [![Gitter chat][chat badge]][chat link]
 
-A tool to help BKKHack members collaborate on projects. Access it at https://bkkhack.github.io/hackmap.
+The hackmap is a visual tool developed by [the BKK/hack community][BKK/hack] to help members find one another and collaborate at hack night meetup events. See it in action at <https://bkkhack.github.io/hackmap>.
 
-# Development
+Some of our main design goals for this application were:
 
-If you want to contribute, we'd love it! Feel free to open issues or pull requests in this repository.
-If you have any questions, ask will, djay or ches in the [bkkhack slack channel](https://thailanddevs.slack.com/messages/C04UFE0B9/).
+  - Make it easy and inexpensive to operate. The hackmap runs on [GitHub Pages] and a small free Heroku Dyno as an authentication proxy. Data persistence is done entirely through GitHub issues with the GitHub API.
+  - Reduce friction for new community members to join and participate. You need only a GitHub account, which we think is a good step even for beginning developers.
 
-## Overview
+If you'd like to use and enhance the hackmap for your own community, we welcome contributions to generalize it and make it more configurable.
+
+[GitHub Pages]: https://pages.github.com/
+
+## Development
+
+If you want to contribute, we'd love it! Feel free to open issues or pull requests in this repository. There are number of issues already tracking feature wishes and known bugs, dive in!
+
+If you have any questions, ask [@waf], [@djay] or [@ches] in the [Gitter chat][chat link].
+
+### Overview
 
 This webapp is a single page application, and contains client-side code only. The server-side functionality is provided by:
 
-- Github Issues - This is the primary data store. The client-side code makes GitHub API calls to persist data as GitHub issue comments.
+- GitHub Issues - This is the primary data store. The client-side code makes GitHub API calls to persist data as GitHub issue comments.
 - Heroku - A very small, free instance running [GateKeeper](https://github.com/prose/gatekeeper) to hide the GitHub OAuth secret.
 
-The client-side code uses written in ES6, with [Vue.js](https://vuejs.org/) for the UI. It uses webpack and babel for transpilation to ES5.
+The client-side code is written in ES6, with [Vue.js](https://vuejs.org/) for the UI. It uses webpack and babel for transpilation to ES5.
 
-## Working on the code
+### Working on the code
 
 To get started, clone this repo and run:
 
@@ -26,20 +36,20 @@ To get started, clone this repo and run:
 The following commands are also available:
 
 - `npm test` -- starts the unit test runner, and reruns unit tests as files change.
-- `npm run lint` -- checking code style according to eslint setup.
-- `npm run build` -- builds the assets (js, sourcemaps, etc) into the `dist` folder.
-- `npm run deploy` -- deploy dist folder to gh-pages branch.
+- `npm run lint` -- checks code style according to eslint setup.
+- `npm run build` -- builds the assets (js, sourcemaps, etc.) into the `dist` folder.
+- `npm run deploy` -- deploys dist folder to gh-pages branch.
 
-## Editor Setup
+### Editor Setup
 
-This project uses [Vue.js Components](https://vuejs.org/v2/guide/single-file-components.html) (i.e. .vue files) to organize
+This project uses [Vue.js Components](https://vuejs.org/v2/guide/single-file-components.html) (i.e. `.vue` files) to organize
 the code. You'll probably want to install an extension to your editor to get syntax highlighting, code completion, etc.
 [Most major editors are supported](https://github.com/vuejs/awesome-vue#source-code-editing).
 
 Additionally, we use an `.editorconfig` file to automatically configure coding style (e.g. indent levels, tabs vs spaces).
 Again, most major editors have an [editorconfig plugin](http://editorconfig.org/#download), or already support it natively.
 
-## Navigating the code
+### Navigating the code
 
 ```
 src
@@ -62,7 +72,7 @@ build
 └── build scripts for webpack, from https://github.com/vuejs-templates/webpack
 ```
 
-## Testing Authentication
+### Testing Authentication
 
 When authenticating with GitHub, GitHub will check the referring URL, and it must match exactly with the URL configured for the OAuth integration. The URL configured for hackmap is `https://bkkhack.github.io/hackmap/` (note the trailing slash!). This means that you cannot test authentication on `http://localhost:8080/hackmap/`, the URL that the webpack dev server uses. This can be fixed in 2 steps: adding a hosts file entry and reverse proxying port 8080 to port 80:
 
@@ -112,4 +122,14 @@ Now, after starting the webpack development webserver, navigating to https://bkk
     - The client id should be set in `src/github-oauth.js`
     - The secret token should be configured in the `bkkhackmap` heroku instance.
 2. Create a new GitHub issue tagged with "BKKHack Main Thread". This issue will be used as the back-end data store.
-3. Create a black and transparent SVG that represents the floor plan of BKKHack. Save it as `images/floorplan.svg`.
+3. Create a black and transparent SVG that represents the floor plan of the hack night venue. Save it as `images/floorplan.svg`.
+
+
+[build badge]: https://travis-ci.org/bkkhack/hackmap.svg?branch=master
+[build link]: https://travis-ci.org/bkkhack/hackmap
+[chat badge]: https://badges.gitter.im/bkkhack/hackmap.svg
+[chat link]: https://gitter.im/bkkhack/hackmap
+[BKK/hack]: https://www.meetup.com/bkkhack/
+[@waf]: https://github.com/waf
+[@djay]: https://github.com/djay
+[@ches]: https://github.com/ches
