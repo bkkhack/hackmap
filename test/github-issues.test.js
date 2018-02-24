@@ -1,12 +1,14 @@
 const axios = require('axios')
 const MockAdapter = require('axios-mock-adapter')
+
 const axiosMock = () => {
   return new MockAdapter(axios)
 }
 
+jest.useFakeTimers();
+
 import auth from '../src/github-oauth.js'
 import GitHubIssueService from '../src/github-issues.js'
-
 jest.mock('../src/github-oauth.js', () => {
   return {
     isLoggedIn: jest.fn(),
@@ -50,10 +52,17 @@ let mockGetMainThread = (mock) => {
   })
 }
 
+function hideConsoleErrorFromTestRunner() {
+  // hide ugly console.error output in test runner, because we're testing error behavior
+  spyOn(console, 'error')
+}
+
 describe('GitHubIssueService', () => {
   describe('.config', () => {
     describe('.onError callback will be fired when something went wrong with', () => {
       it('issues API request', (done) => {
+        hideConsoleErrorFromTestRunner()
+
         let mock = axiosMock()
         mockGetMainThread(mock)
         mock.onGet(issuesURL).reply(function(config) {
@@ -70,6 +79,8 @@ describe('GitHubIssueService', () => {
       })
 
       it('ideas API request', (done) => {
+        hideConsoleErrorFromTestRunner()
+
         let mock = axiosMock()
         mockGetIssues(mock)
         mock.onGet(mainThreadURL).networkError()

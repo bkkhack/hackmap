@@ -145,14 +145,9 @@ export default class GitHubIssueService {
         })
     }
 
-    if (process.env['NODE_ENV'] !== 'test') {
-      let interval = 1000 * this.config.pollIntervalSeconds
-      window.setInterval(() => {
-        console.log('...')
-        poll()
-      }, interval)
-    }
     console.log('start polling')
+    let interval = 1000 * this.config.pollIntervalSeconds
+    window.setInterval(poll, interval)
     return poll()
   }
 
@@ -182,8 +177,6 @@ export default class GitHubIssueService {
   }
 
   reportError (err) {
-    if (process.env['NODE_ENV'] !== 'test') {
-      console.error(err)
-    }
+    console.error(err)
   }
 }
