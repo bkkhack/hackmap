@@ -302,232 +302,33 @@ div[draggable='true'] {
  * General app layout
  */
 
-.projects {
-    order: 1;
-    overflow: scroll;
-}
 .center-column,
 .side-column {
-    padding:10px;
-    min-height:550px;
-    overflow-y:auto;
+  padding:10px;
+  min-height:550px;
+  overflow-y:auto;
 }
 .center-column {
-    order: 2;
-    flex: 1;
-    background-image: radial-gradient(circle at 50% 50%, rgba(0, 153, 255, 0.2) 0%, rgba(255, 255, 255, 0) 50%);
-    position: relative;
-}
-.side-column {
-    background-color:rgba(51, 51, 51, 0.8);
-    box-shadow:0 0 10px #000;
-    box-sizing:border-box;
-    flex-basis: 300px;
-}
-.details {
-    order: 3;
-    text-align:center;
-    padding-top:60px;
-}
-.details.side-column {
+  order: 2;
+  flex: 1;
+  background-image: radial-gradient(circle at 50% 50%, rgba(0, 153, 255, 0.2) 0%, rgba(255, 255, 255, 0) 50%);
   position: relative;
 }
-
-
-/*
- * left column -- project list and form
- */
-.glow-button {
-    border-radius:4px;
-    border: 2px dashed #326fce;
-    box-sizing:border-box;
-    color: #326fce;
-    font-size:18pt;
-    height:40px;
-    height:40px;
-    width:100%;
-    background-color:transparent;
-    outline:none;
-    cursor:pointer;
-    transition: all linear 0.2s;
-    animation: glow-button 1s infinite alternate
+.side-column {
+  background-color:rgba(51, 51, 51, 0.8);
+  box-shadow:0 0 10px #000;
+  box-sizing:border-box;
+  flex-basis: 300px;
 }
-.glow-button:hover {
-    animation: none;
-    border-color: #3a7ce2;
-    color: #3a7ce2;
+.projects.side-column {
+  order: 1;
+  overflow: scroll;
 }
-.glow-button:active {
-    color: #6af;
-}
-.glow-button.disabled {
-    border: 2px dashed #6384b7;
-    color: #6384b7;
-    cursor: default;
-}
-@keyframes glow-button {
-    from { color: #326fce; border-color: #326fce }
-    to { color: #3a7ce2; border-color: #3a7ce2 }
-}
-.project-form {
-    overflow:hidden;
-    max-height:0;
-    transition:max-height linear 0.4s;
-}
-.project-form.open {
-    max-height:500px;
-}
-.project {
-    -webkit-user-select: none;
-    user-select: none;
-    box-sizing:border-box;
-    height:42px;
-    line-height:42px;
-    background-color:rgba(255, 255, 255, 0.1);
-    border:1px solid #777;
-    margin:10px 0;
-    overflow:hidden;
-}
-.project.selected {
-    border:1px solid #397ce2;
-}
-.project img {
-    vertical-align:middle;
-    display:inline-block;
-    margin-right:5px;
-}
-/* css loader in left column */
-.loader {
-    margin: 50px auto 0;
-    width: 70px;
-    text-align: center;
-}
-.loader > div {
-    width: 18px;
-    height: 18px;
-    background-color: rgba(255,255,255,.8);
-
-    border-radius: 100%;
-    display: inline-block;
-    -webkit-animation: zoom 1.4s infinite ease-in-out both;
-    animation: zoom 1.4s infinite ease-in-out both;
-}
-.loader .loader1 {
-    -webkit-animation-delay: -0.32s;
-    animation-delay: -0.32s;
-}
-.loader .loader2 {
-    -webkit-animation-delay: -0.16s;
-    animation-delay: -0.16s;
-}
-@keyframes zoom {
-    0%, 80%, 100% {
-        -webkit-transform: scale(0);
-        transform: scale(0);
-    } 40% {
-        -webkit-transform: scale(1.0);
-        transform: scale(1.0);
-    }
-}
-
-/*
- * Main Column - map
- */
-.help-icon {
-    position:absolute;
-    top:0;
-    left:0;
-    padding:10px 15px;
-    font-size:12pt;
-}
-.help-icon .help-text {
-    display:none;
-    position:relative;
-    background-color:rgba(51, 51, 51, 0.8);
-    box-shadow:0 0 10px #000;
-    width:300px;
-    min-height:100px;
-    color:#fff;
-    font-weight:normal;
-    z-index:2;
-    padding:10px;
-    top:-16px;
-    white-space: pre-line; /* honor line breaks that the user typed */
-}
-.help-icon:hover .help-text {
-    display:block;
-}
-.account-status {
-    display:block;
-    position:absolute;
-    top:0;
-    right:0;
-    margin:0;
-    font-size:12pt;
-    padding:10px 15px 0 0;
-}
-.droptarget {
-    width:90%;
-    position:relative;
-    margin:40px auto 0 auto;
-}
-.floorplan {
-    /* floorplan image is assumed to be black vector image */
-    -webkit-filter:invert(100%) opacity(40%);
-    filter:invert(100%) opacity(40%);
-    width:100%;
-
-    z-index:0;
-    /* disable drag of the floorplan image */
-    pointer-events:none;
-}
-.marker {
-    position:absolute;
-    z-index:1;
-}
-.marker.selected {
-    -webkit-animation: bounce 2s 2;
-    animation: bounce 2s 2;
-}
-@keyframes bounce {
-    0%, 20%, 50%, 80%, 100% {
-        transform: translateY(0);
-    }
-    40% {
-        transform: translateY(-30px);
-    }
-    60% {
-        transform: translateY(-15px);
-    }
-}
-
-/*
- * Right column -- project details
- */
-.details h2,
-.details p {
-    margin:15px 0;
-}
-.details .avatar {
-    border: 1px solid #226699;
-}
-.edit-button {
-    position:absolute;
-    top:0;
-    left:0;
-    padding:10px;
-}
-.delete-button {
-    position:absolute;
-    top:0;
-    right:0;
-    padding:10px;
-}
-.delete-button:hover {
-    color: red;
-}
-.selected-project-description {
-    text-align:left;
+.details.side-column {
+  order: 3;
+  text-align:center;
+  padding-top:60px;
+  position: relative;
 }
 
 /* github avatar resizes -- github stopped respecting the &s parameter
