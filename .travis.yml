@@ -1,7 +1,15 @@
 language: node_js
 node_js:
-  - "node"
+  - node
 cache:
   directories:
-    - "node_modules"
+    - node_modules
 script: npm run continuous-integration
+
+notifications:
+  webhooks:
+    on_success: change
+    on_failure: always
+    on_start: never
+    urls:
+      - https://webhooks.gitter.im/e/a9eb3f6c2abfa7d0b93f
