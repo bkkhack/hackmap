@@ -11,7 +11,7 @@
       @updateSelectedProject="updateSelectedProject"
       @login="login" @logout="logout" @drop="centerDrop"
       :projects="projects" :selectedProject="selectedProject"
-      :helpText="helpText" :username="username"
+      :mainThread="mainThread" :username="username"
       :mapWidth="mapWidth" :mapHeight="mapHeight"
       >
     </center>
@@ -41,7 +41,10 @@ export default {
   data () {
     return {
       state: '',
-      helpText: '',
+      mainThread: {
+        title: '',
+        helpText: ''
+      },
       projects: [],
       mapWidth: 0,
       mapHeight: 0,
@@ -203,8 +206,9 @@ export default {
           this.userAlreadyHasProject = true
         }
       },
-      onHelpText: helpText => {
-        this.helpText = helpText
+      onMainThreadLoaded: thread => {
+        this.mainThread.helpText = thread.body
+        this.mainThread.title = thread.title
       },
       onUserAuthenticated: response => {
         this.username = response.data.login
@@ -232,12 +236,12 @@ export default {
 </script>
 
 <style>
-html, body, #app, #appContainer {
+  html, body, #app, #appContainer {
     margin: 0;
     padding: 0;
     height: 100%;
-}
-html {
+  }
+  html {
     /* css blueprint pattern */
     background-color:#269;
     background-image: linear-gradient(rgba(255, 255, 255, .1) 2px, transparent 2px),
@@ -246,8 +250,8 @@ html {
     linear-gradient(90deg, rgba(255,255,255,.2) 1px, transparent 1px);
     background-size:100px 100px, 100px 100px, 20px 20px, 20px 20px;
     background-position:-2px -2px, -2px -2px, -1px -1px, -1px -1px;
-}
-#appContainer {
+  }
+  #appContainer {
     color:#fff;
     font-family:sans-serif;
     display:flex;
@@ -255,22 +259,22 @@ html {
     flex-direction:row;
     justify-content:flex-start;
     align-items:stretch;
-}
-a {
+  }
+  a {
     color:#fff;
     font-weight:bold;
     text-decoration:none;
     cursor:pointer;
-}
-h1 {
+  }
+  h1 {
     font-weight:normal;
     text-align:center;
     font-size:24pt;
     margin:0;
     -webkit-user-select: none;
     user-select: none;
-}
-input[type='text'], textarea {
+  }
+  input[type='text'], textarea {
     box-sizing:border-box;
     border-radius:5px;
     font-size:1em;
@@ -280,59 +284,59 @@ input[type='text'], textarea {
     outline:none;
     transition:background-color linear 0.2s;
     background-color:rgba(255,255,255,.9);
-}
-input:focus,
-textarea:focus {
+  }
+  input:focus,
+  textarea:focus {
     background-color:rgba(255,255,255,1);
-}
-textarea {
+  }
+  textarea {
     height:200px;
-}
-img[draggable='true'],
-div[draggable='true'] {
+  }
+  img[draggable='true'],
+  div[draggable='true'] {
     cursor:pointer;
-}
-[v-cloak] {
+  }
+  [v-cloak] {
     /* If marked with v-cloak (vue cloak), this overrides everything.
      * Vue will remove this attribute when it's initialized. */
-    visibility: hidden !important;
-}
+  visibility: hidden !important;
+  }
 
-/*
- * General app layout
- */
+  /*
+   * General app layout
+   */
 
-.center-column,
-.side-column {
-  padding:10px;
-  min-height:550px;
-  overflow-y:auto;
-}
-.center-column {
-  order: 2;
-  flex: 1;
-  background-image: radial-gradient(circle at 50% 50%, rgba(0, 153, 255, 0.2) 0%, rgba(255, 255, 255, 0) 50%);
-  position: relative;
-}
-.side-column {
-  background-color:rgba(51, 51, 51, 0.8);
-  box-shadow:0 0 10px #000;
-  box-sizing:border-box;
-  flex-basis: 300px;
-}
-.projects.side-column {
-  order: 1;
-  overflow: scroll;
-}
-.details.side-column {
-  order: 3;
-  text-align:center;
-  padding-top:60px;
-  position: relative;
-}
+  .center-column,
+  .side-column {
+    padding:10px;
+    min-height:550px;
+    overflow-y:auto;
+  }
+  .center-column {
+    order: 2;
+    flex: 1;
+    background-image: radial-gradient(circle at 50% 50%, rgba(0, 153, 255, 0.2) 0%, rgba(255, 255, 255, 0) 50%);
+    position: relative;
+  }
+  .side-column {
+    background-color:rgba(51, 51, 51, 0.8);
+    box-shadow:0 0 10px #000;
+    box-sizing:border-box;
+    flex-basis: 300px;
+  }
+  .projects.side-column {
+    order: 1;
+    overflow: scroll;
+  }
+  .details.side-column {
+    order: 3;
+    text-align:center;
+    padding-top:60px;
+    position: relative;
+  }
 
-/* github avatar resizes -- github stopped respecting the &s parameter
- * for default generated avatar images, so we manually do it here */
-img[src$="s=40"] { width: 40px; height: 40px; }
-img[src$="s=120"] { width: 120px; height: 120px; }
+  /* github avatar resizes -- github stopped respecting the &s parameter
+   * for default generated avatar images, so we manually do it here */
+  img[src$="s=40"] { width: 40px; height: 40px; }
+  img[src$="s=120"] { width: 120px; height: 120px; }
 </style>

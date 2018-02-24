@@ -21,7 +21,7 @@ jest.mock('../src/github-oauth.js', () => {
 let validConfig = () => {
   return {
     issueNumber: 1,
-    onHelpText: () => {},
+    onMainThreadLoaded: () => {},
     organization: 'bkkhack',
     repository: 'hackmap',
     label: 'BKKHack Main Thread',
@@ -107,8 +107,8 @@ describe('GitHubIssueService', () => {
       mockGetMainThread(mock)
 
       let cfg = validConfig()
-      cfg.onHelpText = (msg) => {
-        expect(msg).toEqual(expectedIssue.body)
+      cfg.onMainThreadLoaded = (mainThread) => {
+        expect(mainThread.body).toEqual(expectedIssue.body)
         done()
       }
       instance(cfg)

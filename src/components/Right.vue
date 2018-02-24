@@ -37,29 +37,29 @@
 </script>
 
 <style>
-.details h2,
-.details p {
+  .details h2,
+  .details p {
     margin:15px 0;
-}
-.details .avatar {
+  }
+  .details .avatar {
     border: 1px solid #226699;
-}
-.edit-button {
+  }
+  .edit-button {
     position:absolute;
     top:0;
     left:0;
     padding:10px;
-}
-.delete-button {
+  }
+  .delete-button {
     position:absolute;
     top:0;
     right:0;
     padding:10px;
-}
-.delete-button:hover {
+  }
+  .delete-button:hover {
     color: red;
-}
-.selected-project-description {
+  }
+  .selected-project-description {
     text-align:left;
-}
+  }
 </style>

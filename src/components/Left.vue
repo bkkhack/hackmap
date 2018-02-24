@@ -21,13 +21,12 @@
     {{project.title}}
     </div>
     <div class="details" v-if="state === 'running' && projects.length === 0">
-      <p>No hacks yet! You can be first!</p>
+      <p>No hacks yet, you can be the first!</p>
     </div>
     <div class="loader" v-if="state === 'init'">
       <div class="loader1"></div>
       <div class="loader2"></div>
       <div class="loader3"></div>
-      <p>No comments because we're loading</p>
     </div>
   </div>
 </template>
@@ -51,7 +50,7 @@
 </script>
 
 <style>
-.glow-button {
+  .glow-button {
     border-radius:4px;
     border: 2px dashed #326fce;
     box-sizing:border-box;
@@ -65,33 +64,33 @@
     cursor:pointer;
     transition: all linear 0.2s;
     animation: glow-button 1s infinite alternate
-}
-.glow-button:hover {
+  }
+  .glow-button:hover {
     animation: none;
     border-color: #3a7ce2;
     color: #3a7ce2;
-}
-.glow-button:active {
+  }
+  .glow-button:active {
     color: #6af;
-}
-.glow-button.disabled {
+  }
+  .glow-button.disabled {
     border: 2px dashed #6384b7;
     color: #6384b7;
     cursor: default;
-}
-@keyframes glow-button {
+  }
+  @keyframes glow-button {
     from { color: #326fce; border-color: #326fce }
     to { color: #3a7ce2; border-color: #3a7ce2 }
-}
-.project-form {
+  }
+  .project-form {
     overflow:hidden;
     max-height:0;
     transition:max-height linear 0.4s;
-}
-.project-form.open {
+  }
+  .project-form.open {
     max-height:500px;
-}
-.project {
+  }
+  .project {
     -webkit-user-select: none;
     user-select: none;
     box-sizing:border-box;
@@ -101,22 +100,25 @@
     border:1px solid #777;
     margin:10px 0;
     overflow:hidden;
-}
-.project.selected {
+  }
+  .project.selected {
     border:1px solid #397ce2;
-}
-.project img {
+  }
+  .project img {
     vertical-align:middle;
     display:inline-block;
     margin-right:5px;
-}
-/* css loader in left column */
-.loader {
+  }
+  .details {
+    text-align:center;
+  }
+  /* css loader in left column */
+  .loader {
     margin: 50px auto 0;
     width: 70px;
     text-align: center;
-}
-.loader > div {
+  }
+  .loader > div {
     width: 18px;
     height: 18px;
     background-color: rgba(255,255,255,.8);
@@ -125,22 +127,22 @@
     display: inline-block;
     -webkit-animation: zoom 1.4s infinite ease-in-out both;
     animation: zoom 1.4s infinite ease-in-out both;
-}
-.loader .loader1 {
+  }
+  .loader .loader1 {
     -webkit-animation-delay: -0.32s;
     animation-delay: -0.32s;
-}
-.loader .loader2 {
+  }
+  .loader .loader2 {
     -webkit-animation-delay: -0.16s;
     animation-delay: -0.16s;
-}
-@keyframes zoom {
+  }
+  @keyframes zoom {
     0%, 80%, 100% {
-        -webkit-transform: scale(0);
-        transform: scale(0);
+      -webkit-transform: scale(0);
+      transform: scale(0);
     } 40% {
-        -webkit-transform: scale(1.0);
-        transform: scale(1.0);
+      -webkit-transform: scale(1.0);
+      transform: scale(1.0);
     }
-}
+  }
 </style>
