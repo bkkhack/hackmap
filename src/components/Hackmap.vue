@@ -12,7 +12,7 @@
       @login="login" @logout="logout" @drop="centerDrop"
       :projects="projects" :selectedProject="selectedProject"
       :mainThread="mainThread" :username="username"
-      :mapWidth="mapWidth" :mapHeight="mapHeight"
+      :floorplan="floorplan"
       >
     </center>
     <right
@@ -45,9 +45,12 @@ export default {
         title: '',
         helpText: ''
       },
+      floorplan: {
+        url: '',
+        width: 0,
+        height: 0
+      },
       projects: [],
-      mapWidth: 0,
-      mapHeight: 0,
       form: {
         isOpen: false,
         title: '',
@@ -116,8 +119,8 @@ export default {
       var oldY = project.y
       // the map is a percentage width of the overall window, so we need
       // to save x and y as percentage values.
-      project.x = event.offsetX / this.mapWidth
-      project.y = event.offsetY / this.mapHeight
+      project.x = event.offsetX / this.floorplan.width
+      project.y = event.offsetY / this.floorplan.height
       githubIssue.updateProject(project)
         .catch(err => {
           console.log('update rejected', err)
@@ -126,9 +129,9 @@ export default {
         })
     },
     updateMapDimensions () {
-      var floorplan = this.$el.querySelector('.floorplan')
-      this.mapWidth = floorplan.clientWidth
-      this.mapHeight = floorplan.clientHeight
+      var floorplanElement = this.$el.querySelector('.floorplan')
+      this.floorplan.width = floorplanElement.clientWidth
+      this.floorplan.height = floorplanElement.clientHeight
     },
     login () {
       githubIssue.ensureAuthenticatedClient().then(data => console.log(data))
@@ -207,8 +210,9 @@ export default {
         }
       },
       onMainThreadLoaded: thread => {
-        this.mainThread.helpText = thread.body
+        this.mainThread.helpText = thread.helpText
         this.mainThread.title = thread.title
+        this.floorplan.url = thread.floorplanUrl
       },
       onUserAuthenticated: response => {
         this.username = response.data.login

@@ -7,7 +7,7 @@
     <div class="droptarget"
       @dragover="dragover"
       @drop="drop">
-    <img src="../floorplan/learnhub.png" class="floorplan" />
+    <img v-bind:src="floorplan.url" class="floorplan" />
     <img class="marker" width="36"
       v-for="project in projects"
       v-if="project.x"
@@ -17,7 +17,7 @@
       @click="updateSelectedProject(project)"
       v-bind:class="{ selected: selectedProject === project }"
       v-bind:data-id="project.id"
-      v-bind:style="{ left: mapWidth * project.x - 20 + 'px', top: mapHeight * project.y - 20 + 'px' }"
+      v-bind:style="{ left: floorplan.width * project.x - 20 + 'px', top: floorplan.height * project.y - 20 + 'px' }"
       v-bind:src="project.avatar_thumbnail"
       v-bind:alt="project.username"
       v-bind:title="project.title"
@@ -29,7 +29,7 @@
 <script>
   export default {
     name: 'center',
-    props: ['mainThread', 'username', 'projects', 'selectedProject', 'mapWidth', 'mapHeight'],
+    props: ['mainThread', 'username', 'projects', 'selectedProject', 'floorplan'],
     methods: {
       dragover (event) {
         this.$emit('dragover', event)

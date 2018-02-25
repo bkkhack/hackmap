@@ -42,11 +42,11 @@ const mainThreadURL = /issues\/\d+\/comments/
 
 let mockGetIssues = (mock) => {
   mock.onGet(issuesURL).reply(function(config) {
-    return [200, [{ number: 1 }]]
+    return [200, [{ number: 1, body: 'hello <!-- floorplan: http://www.example.com -->'}]]
   })
 }
 
-let mockGetMainThread = (mock) => {
+let mockPollRequest = (mock) => {
   mock.onGet(mainThreadURL).reply(function(config) {
     return [200, [], { etag: '12345' }]
   })
@@ -64,7 +64,7 @@ describe('GitHubIssueService', () => {
         hideConsoleErrorFromTestRunner()
 
         let mock = axiosMock()
-        mockGetMainThread(mock)
+        mockPollRequest(mock)
         mock.onGet(issuesURL).reply(function(config) {
           return [404]
         })
@@ -78,7 +78,7 @@ describe('GitHubIssueService', () => {
         instance(cfg)
       })
 
-      it('ideas API request', (done) => {
+      it('polling API request', (done) => {
         hideConsoleErrorFromTestRunner()
 
         let mock = axiosMock()
@@ -96,19 +96,32 @@ describe('GitHubIssueService', () => {
     })
   })
 
-  describe('.onHelpText callback ', () => {
+  describe('.onMainThreadLoaded callback ', () => {
     it('will be fired when main issue found', (done) => {
-      let expectedIssue = { number: 1, body: 'hello' }
+      let githubIssue = {
+        number: 1,
+        title: 'title',
+        body: 'hello <!-- floorplan: http://example.com -->'
+      }
+      let expectedThread = {
+        number: 1,
+        title: 'title',
+        helpText: 'hello <!-- floorplan: http://example.com -->',
+        floorplanUrl: 'http://example.com'
+      }
 
       let mock = axiosMock()
       mock.onGet(issuesURL).reply(function(config) {
-        return [200, [expectedIssue]]
+        return [200, [githubIssue]]
       })
-      mockGetMainThread(mock)
+      mockPollRequest(mock)
 
       let cfg = validConfig()
       cfg.onMainThreadLoaded = (mainThread) => {
-        expect(mainThread.body).toEqual(expectedIssue.body)
+        expect(mainThread.number).toEqual(expectedThread.number)
+        expect(mainThread.title).toEqual(expectedThread.title)
+        expect(mainThread.helpText).toEqual(expectedThread.helpText)
+        expect(mainThread.floorplanUrl).toEqual(expectedThread.floorplanUrl)
         done()
       }
       instance(cfg)

@@ -122,8 +122,7 @@ Now, after starting the webpack development webserver, navigating to https://bkk
     - The client id should be set in `src/github-oauth.js`
     - The secret token should be configured in the `bkkhackmap` heroku instance.
 2. Create a new GitHub issue tagged with "BKKHack Main Thread". This issue will be used as the back-end data store.
-3. Create a black and transparent SVG that represents the floor plan of the hack night venue. Save it as `images/floorplan.svg`.
-
+3. Create a black and transparent SVG that represents the floor plan of the hack night venue. Upload it to the GitHub issue (i.e. paste it into the textarea) and refer to it in an html comment of the form `<!-- floorplan: http://example.com/floorplan.svg -->`.
 
 [build badge]: https://travis-ci.org/bkkhack/hackmap.svg?branch=master
 [build link]: https://travis-ci.org/bkkhack/hackmap
