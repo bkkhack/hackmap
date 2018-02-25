@@ -49,12 +49,13 @@ export default class GitHubIssueService {
    * @returns {Promise}
    */
   getIssues () {
-    return this.github.repo.get('issues', { params: { labels: this.config.label } })
-                           .then((response) => response.data)
-                           .catch((err) => {
-                             this.reportError(err)
-                             throw new Error('Unable get issues data')
-                           })
+    return this.github.repo
+      .get('issues', { params: { labels: this.config.label } })
+      .then((response) => response.data)
+      .catch((err) => {
+        this.reportError(err)
+        throw new Error('Unable get issues data')
+      })
   }
 
   getMainThread (issues) {
@@ -72,36 +73,25 @@ export default class GitHubIssueService {
       }
     }
 
-    this.config.onHelpText(issue.body)
+    this.config.onMainThreadLoaded(issue)
     this.issueNumber = issue.number
   }
 
   postNewProject (project) {
-    return this.ensureAuthenticatedClient()
-      .then(() => {
-        let body = serialization.serializeProjectToComment(project)
-        return this.github.repo
-          .post('issues/' + this.issueNumber + '/comments', {
-            body: body
-          }, {
-            headers: serialization.commentFormat
-          })
-      })
-      .then((response) => {
-        return serialization.deserializeCommentToProject(response.data)
-      })
+    return this.updateProjectAjaxCall(project, this.github.repo.post, 'issues/' + this.issueNumber + '/comments')
   }
 
   updateProject (project) {
+    return this.updateProjectAjaxCall(project, this.github.repo.patch, 'issues/comments/' + project.id)
+  }
+
+  updateProjectAjaxCall (project, ajaxCall, url) {
     return this.ensureAuthenticatedClient()
       .then(() => {
         let body = serialization.serializeProjectToComment(project)
-        return this.github.repo
-          .patch('issues/comments/' + project.id, {
-            body: body
-          }, {
-            headers: serialization.commentFormat
-          })
+        return ajaxCall(url, { body: body }, {
+          headers: serialization.commentFormat
+        })
       })
       .then(response => {
         return serialization.deserializeCommentToProject(response.data)
@@ -111,8 +101,7 @@ export default class GitHubIssueService {
   deleteProject (id) {
     return this.ensureAuthenticatedClient()
       .then(() => {
-        return this.github.repo
-          .delete('issues/comments/' + id)
+        return this.github.repo.delete('issues/comments/' + id)
       })
   }
 
@@ -122,8 +111,10 @@ export default class GitHubIssueService {
 
     var poll = () => {
       if (window.document.hidden) {
+        console.log('skipping poll because tab is hidden')
         return Promise.resolve()
       }
+      console.log('polling with etag ' + etag)
       return this.github.repo
         .get(commentsUrl, {
           headers: Object.assign(
@@ -133,6 +124,7 @@ export default class GitHubIssueService {
           )
         })
         .then(response => {
+          console.log('poll response ' + response.status)
           if (response.status === 200) {
             etag = response.headers.etag
             var projects = response.data.map(serialization.deserializeCommentToProject)
@@ -145,14 +137,9 @@ export default class GitHubIssueService {
         })
     }
 
-    if (process.env['NODE_ENV'] !== 'test') {
-      let interval = 1000 * this.config.pollIntervalSeconds
-      window.setInterval(() => {
-        console.log('...')
-        poll()
-      }, interval)
-    }
     console.log('start polling')
+    let interval = 1000 * this.config.pollIntervalSeconds
+    window.setInterval(poll, interval)
     return poll()
   }
 
@@ -160,10 +147,7 @@ export default class GitHubIssueService {
     return this.config.onAuthenticationRequired()
       .then(token => {
         if (!this.github.isAuthenticated) {
-          this.github = githubApiClient(
-            this.config.organization,
-            this.config.repository,
-            token)
+          this.github = githubApiClient(this.config.organization, this.config.repository, token)
           this.github.isAuthenticated = true
           return this.github.get('user')
         }
@@ -176,14 +160,10 @@ export default class GitHubIssueService {
 
   deauthenticateClient () {
     auth.logOut()
-    this.github = githubApiClient(
-      this.config.organization,
-      this.config.repository)
+    this.github = githubApiClient(this.config.organization, this.config.repository)
   }
 
   reportError (err) {
-    if (process.env['NODE_ENV'] !== 'test') {
-      console.error(err)
-    }
+    console.error(err)
   }
 }
