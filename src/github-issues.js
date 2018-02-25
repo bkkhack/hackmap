@@ -73,8 +73,10 @@ export default class GitHubIssueService {
       }
     }
 
-    this.config.onMainThreadLoaded(issue)
     this.issueNumber = issue.number
+
+    var thread = serialization.deserializeIssueToMainThread(issue)
+    this.config.onMainThreadLoaded(thread)
   }
 
   postNewProject (project) {

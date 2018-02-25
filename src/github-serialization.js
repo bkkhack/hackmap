@@ -3,6 +3,7 @@
  */
 
 const commentExtractionRegex = /<!-- ([.\d]+),([.\d]+) -->/
+const mainThreadAttributesRegex = /<!--\s*floorplan\s*:\s*([^,\s]+),?\s*-->/
 
 function parseCoordinatesFromComment (commentLines) {
   var lastLine = commentLines.slice(-1)[0]
@@ -43,5 +44,16 @@ export default {
       (project.descriptionText || '') + '\r\n' +
       `<!-- ${project.x},${project.y} -->`
     return body
+  },
+
+  deserializeIssueToMainThread: function (issue) {
+    let [, floorplanUrl] = mainThreadAttributesRegex.exec(issue.body)
+
+    return {
+      title: issue.title,
+      helpText: issue.body,
+      number: issue.number,
+      floorplanUrl: floorplanUrl
+    }
   }
 }
