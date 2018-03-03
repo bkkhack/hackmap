@@ -80,18 +80,18 @@ export default class GitHubIssueService {
   }
 
   postNewProject (project) {
-    return this.updateProjectAjaxCall(project, this.github.repo.post, 'issues/' + this.issueNumber + '/comments')
+    return this.updateProjectAjaxCall(project, 'post', 'issues/' + this.issueNumber + '/comments')
   }
 
   updateProject (project) {
-    return this.updateProjectAjaxCall(project, this.github.repo.patch, 'issues/comments/' + project.id)
+    return this.updateProjectAjaxCall(project, 'patch', 'issues/comments/' + project.id)
   }
 
-  updateProjectAjaxCall (project, ajaxCall, url) {
+  updateProjectAjaxCall (project, httpVerb, url) {
     return this.ensureAuthenticatedClient()
       .then(() => {
         let body = serialization.serializeProjectToComment(project)
-        return ajaxCall(url, { body: body }, {
+        return this.github.repo[httpVerb](url, { body: body }, {
           headers: serialization.commentFormat
         })
       })
