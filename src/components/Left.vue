@@ -14,11 +14,29 @@
       v-bind:key="project.id"
       v-bind:data-id="project.id"
       v-bind:class="{ selected: selectedProject === project }"
-      v-bind:draggable="project.username === username"
+      v-bind:draggable="!(selectedProject === project && selectedProject.editMode) && project.username === username"
       v-cloak
       class="project">
-    <img v-bind:src="project.avatar_thumbnail" width="36" v-bind:alt="project.username" draggable="false" />
-    {{project.title}}
+      <div class="project-title-bar">
+        <a class="project-author" v-bind:href="'https://github.com/' + selectedProject.username">@{{project.username}}</a>
+        <div class="project-title" v-if="!selectedProject.editMode">{{project.title}}</div>
+        <input class="project-title-editor" v-else v-model="selectedProject.title" type="text" autofocus>
+      </div>
+      <img
+        class="project-author-avatar"
+        v-bind:title="project.username"
+        v-bind:alt="project.username"
+        v-bind:src="selectedProject == project ? project.avatar : project.avatar_thumbnail"
+        v-bind:data-dragicon="project.avatar_thumbnail"
+        draggable="false" />
+      <div v-if="!selectedProject.editMode" class="project-description" v-html="project.descriptionHtml"></div>
+      <textarea v-else class="project-description-editor" v-model="selectedProject.descriptionText"></textarea>
+      <div class="action-button-bar" v-if="username !== '' && selectedProject.username === username">
+        <a v-if="!selectedProject.editMode" class="edit action-button" @click="toggleEditMode">Edit</a>
+        <a v-if="!selectedProject.editMode" class="delete action-button" @click="deleteComment(selectedProject.id)">Delete</a>
+        <a v-if="selectedProject.editMode" class="cancel action-button" @click="toggleEditMode">Cancel</a>
+        <a v-if="selectedProject.editMode" class="save action-button" @click="updateProject">Save</a>
+      </div>
     </div>
     <div class="details" v-if="state === 'running' && projects.length === 0">
       <p>No hacks yet, you can be the first!</p>
@@ -44,6 +62,15 @@
       },
       updateSelectedProject (project) {
         this.$emit('updateSelectedProject', project)
+      },
+      toggleEditMode () {
+        this.$emit('toggleEditMode')
+      },
+      updateProject () {
+        this.$emit('updateProject')
+      },
+      deleteComment (id) {
+        this.$emit('deleteProject', id)
       }
     }
   }
@@ -94,20 +121,89 @@
     -webkit-user-select: none;
     user-select: none;
     box-sizing:border-box;
-    height:42px;
-    line-height:42px;
     background-color:rgba(255, 255, 255, 0.1);
     border:1px solid #777;
     margin:10px 0;
-    overflow:hidden;
+    padding:0 0 0 8px;
+    max-height:40px;
+    transition: max-height 0.4s linear;
+    will-change: max-height;
+    position:relative;
+    overflow:auto;
+  }
+  .project .project-author {
+    font-size:10pt;
+    font-weight:lighter;
+    color:#ddd;
+    margin-top:8px;
+    display:none;
+    opacity:0;
+    transition: opacity 0.4s linear;
+  }
+  .project .project-title-editor,
+  .project .project-title {
+    margin-top:12px;
+  }
+  .project .project-title {
+    width: 220px;
+  }
+  .project .project-author-avatar {
+    float:right;
+    width:40px;
+    height:40px;
+    padding:0;
+  }
+  .project .project-description-editor,
+  .project .project-description {
+    font-size:11pt;
+  }
+  .project .project-description {
+    display:none;
+    padding-top:4px;
+    clear:both;
+    opacity:0;
+    transition: opacity 0.4s linear;
+  }
+  .project .action-button-bar {
+    width:100%;
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+  .edit.action-button,
+  .save.action-button {
+    color: #a2d6ff;
+    float:right;
+  }
+  .delete.action-button {
+    color:#f77;
+  }
+  .project .action-button {
+    display:inline-block;
+    padding:4px 10px;
+  }
+  .project .action-button-bar a {
+    font-weight:lighter;
+    font-size:smaller;
+  }
+  .project .project-title-bar {
+    float:left;
   }
   .project.selected {
     border:1px solid #397ce2;
+    padding:8px;
+    max-height:400px;
   }
-  .project img {
-    vertical-align:middle;
-    display:inline-block;
-    margin-right:5px;
+  .project.selected .project-description,
+  .project.selected .project-author {
+    display:block;
+    opacity:1;
+  }
+  .project.selected .project-title {
+    width:170px;
+  }
+  .project.selected .project-author-avatar {
+    width:76px;
+    height:76px;
+    padding:2px;
   }
   .details {
     text-align:center;

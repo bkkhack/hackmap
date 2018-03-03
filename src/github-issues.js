@@ -20,7 +20,6 @@ import githubApiClient from './github-api-client.js'
 export default class GitHubIssueService {
   constructor (config) {
     this.config = config
-    this.config.onInit()
     this.github = githubApiClient(config.organization, config.repository)
 
     // if the user has already logged in (e.g. in a previous session), use the

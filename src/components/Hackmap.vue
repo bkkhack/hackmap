@@ -2,6 +2,7 @@
   <div id="appContainer">
     <left
       @toggleForm="toggleForm" @updateSelectedProject="updateSelectedProject"
+      @toggleEditMode="toggleEditMode" @updateProject="updateProject" @deleteProject="deleteProject"
       @drag="leftDrag"
       :state="state"
       :form="form" :projects="projects"
@@ -15,10 +16,12 @@
       :floorplan="floorplan"
       >
     </center>
+    <!--
     <right
       @toggleEditMode="toggleEditMode" @updateProject="updateProject" @deleteProject="deleteProject"
       :selectedProject="selectedProject" :username="username">
     </right>
+-->
   </div>
 </template>
 
@@ -40,7 +43,7 @@ export default {
   },
   data () {
     return {
-      state: '',
+      state: 'init',
       mainThread: {
         title: '',
         helpText: ''
@@ -102,8 +105,13 @@ export default {
       }
     },
     leftDrag (event) {
-      var avatar = event.target.querySelector('img')
-      event.dataTransfer.setDragImage(avatar, 20, 20)
+      var avatar = event.target.querySelector('.project-author-avatar')
+
+      var dragIcon = document.createElement('img')
+      dragIcon.src = avatar.dataset.dragicon
+      event.dataTransfer.setDragImage(dragIcon, 20, 20)
+
+      // event.dataTransfer.setDragImage(avatar, 20, 20)
       var projectId = event.target.dataset.id
       event.dataTransfer.setData('projectId', projectId)
     },
@@ -221,9 +229,6 @@ export default {
       issueNumber: this.issueNumber,
       onError: errMsg => {
         this.notifyError(errMsg)
-      },
-      onInit: () => {
-        this.$set(this.$data, 'state', 'init')
       }
     })
     // we need to calculate map dimensions in order to place the avatars
@@ -280,14 +285,14 @@ export default {
   }
   input[type='text'], textarea {
     box-sizing:border-box;
-    border-radius:5px;
     font-size:1em;
     width:100%;
     margin-bottom:5px;
-    padding: 0.4em;
+    padding: 0.3em;
     outline:none;
     transition:background-color linear 0.2s;
     background-color:rgba(255,255,255,.9);
+    border:1px solid #397ce2;
   }
   input:focus,
   textarea:focus {
@@ -324,7 +329,6 @@ export default {
   }
   .side-column {
     background-color:rgba(51, 51, 51, 0.8);
-    box-shadow:0 0 10px #000;
     box-sizing:border-box;
     flex-basis: 300px;
   }

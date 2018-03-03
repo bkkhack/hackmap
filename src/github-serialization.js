@@ -32,7 +32,7 @@ export default {
       username: comment.user.login,
       userId: comment.user.id,
       avatar_thumbnail: comment.user.avatar_url + '&s=' + 40,
-      avatar: comment.user.avatar_url + '&s=' + 120,
+      avatar: comment.user.avatar_url + '&s=' + 80,
       x: coords.x,
       y: coords.y,
       editMode: false

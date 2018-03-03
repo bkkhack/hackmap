@@ -113,8 +113,21 @@
     z-index:1;
   }
   .marker.selected {
-    -webkit-animation: bounce 2s 2;
-    animation: bounce 2s 2;
+    -webkit-animation: pulse 0.8s 3;
+    animation: pulse 0.8s 3;
+  }
+  @keyframes pulse {
+    from {
+      transform: scale3d(1, 1, 1);
+    }
+
+    50% {
+      transform: scale3d(1.2, 1.2, 1.2);
+    }
+
+    to {
+      transform: scale3d(1, 1, 1);
+    }
   }
   @keyframes bounce {
     0%, 20%, 50%, 80%, 100% {
