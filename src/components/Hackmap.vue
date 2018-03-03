@@ -16,12 +16,6 @@
       :floorplan="floorplan"
       >
     </center>
-    <!--
-    <right
-      @toggleEditMode="toggleEditMode" @updateProject="updateProject" @deleteProject="deleteProject"
-      :selectedProject="selectedProject" :username="username">
-    </right>
--->
   </div>
 </template>
 
@@ -30,7 +24,6 @@ import GitHubIssueService from '../github-issues.js'
 import auth from '../github-oauth.js'
 import Left from './Left.vue'
 import Center from './Center.vue'
-import Right from './Right.vue'
 
 let githubIssue
 export default {
@@ -199,8 +192,7 @@ export default {
   },
   components: {
     Left,
-    Center,
-    Right
+    Center
   },
   mounted () {
     githubIssue = new GitHubIssueService({
