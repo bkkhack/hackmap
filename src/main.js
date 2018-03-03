@@ -4,6 +4,10 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 
+// html5 drag-and-drop support for mobile
+import {polyfill} from 'mobile-drag-drop'
+polyfill()
+
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */

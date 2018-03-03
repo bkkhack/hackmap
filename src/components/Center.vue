@@ -5,7 +5,8 @@
     <a class="account-status" v-if="username" @click="logout" v-cloak>{{username}} (Log out)</a>
     <a class="account-status" v-else @click="login" v-cloak>Log in</a>
     <div class="droptarget"
-      @dragover="dragover"
+      @dragenter="dragevent"
+      @dragover="dragevent"
       @drop="drop">
     <img v-bind:src="floorplan.url" class="floorplan" />
     <img class="marker" width="36"
@@ -31,8 +32,7 @@
     name: 'center',
     props: ['mainThread', 'username', 'projects', 'selectedProject', 'floorplan'],
     methods: {
-      dragover (event) {
-        this.$emit('dragover', event)
+      dragevent (event) {
         event.preventDefault() // mark this element as a drop target.
         event.dataTransfer.dropEffect = 'copy'
       },
