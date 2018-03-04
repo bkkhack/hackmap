@@ -22,7 +22,7 @@ export default {
     var coords = parseCoordinatesFromComment(textLines)
     // title is the first line, description is everything after the first line
     var title = textLines[0]
-    var descriptionText = textLines.length >= 1 ? textLines[1].trim() : ''
+    var descriptionText = textLines.length > 1 ? textLines[1].trim() : ''
     var descriptionHtml = comment.body_html.substring(comment.body_html.indexOf('\n')).trim()
     return {
       id: comment.id,

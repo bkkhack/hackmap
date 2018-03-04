@@ -10,32 +10,32 @@
 
     <div v-for="project in projects"
       @dragstart="drag"
-      @click="updateSelectedProject(project)"
+      @click="updateSelectedProject(project.id)"
       v-bind:key="project.id"
       v-bind:data-id="project.id"
-      v-bind:class="{ selected: selectedProject === project }"
-      v-bind:draggable="!(selectedProject === project && selectedProject.editMode) && project.username === username"
+      v-bind:class="{ selected: selectedProjectId === project.id || project.editMode }"
+      v-bind:draggable="!(selectedProjectId === project.id && project.editMode) && project.username === username"
       v-cloak
       class="project">
       <div class="project-title-bar">
-        <a class="project-author" v-bind:href="'https://github.com/' + selectedProject.username">@{{project.username}}</a>
-        <div class="project-title" v-if="!selectedProject.editMode">{{project.title}}</div>
-        <input class="project-title-editor" v-else v-model="selectedProject.title" type="text" autofocus>
+        <a class="project-author" v-bind:href="'https://github.com/' + project.username" draggable="false">@{{project.username}}</a>
+        <div class="project-title" v-if="!project.editMode">{{project.title}}</div>
+        <input class="project-title-editor" v-else v-model="project.title" type="text" autofocus>
       </div>
       <img
         class="project-author-avatar"
         v-bind:title="project.username"
         v-bind:alt="project.username"
-        v-bind:src="selectedProject == project ? project.avatar : project.avatar_thumbnail"
+        v-bind:src="selectedProjectId == project.id ? project.avatar : project.avatar_thumbnail"
         v-bind:data-dragicon="project.avatar_thumbnail"
         draggable="false" />
-      <div v-if="!selectedProject.editMode" class="project-description" v-html="project.descriptionHtml"></div>
-      <textarea v-else class="project-description-editor" v-model="selectedProject.descriptionText"></textarea>
-      <div class="action-button-bar" v-if="username !== '' && selectedProject.username === username">
-        <a v-if="!selectedProject.editMode" class="edit action-button" @click="toggleEditMode">Edit</a>
-        <a v-if="!selectedProject.editMode" class="delete action-button" @click="deleteComment(selectedProject.id)">Delete</a>
-        <a v-if="selectedProject.editMode" class="cancel action-button" @click="toggleEditMode">Cancel</a>
-        <a v-if="selectedProject.editMode" class="save action-button" @click="updateProject">Save</a>
+      <div v-if="!project.editMode" class="project-description" v-html="project.descriptionHtml"></div>
+      <textarea v-else class="project-description-editor" v-model="project.descriptionText"></textarea>
+      <div class="action-button-bar" v-if="(selectedProjectId == project.id || project.editMode) && project.username === username">
+        <a v-if="!project.editMode" class="edit action-button" @click="toggleEditMode(project.id)">Edit</a>
+        <a v-if="!project.editMode" class="delete action-button" @click="deleteComment(project.id)">Delete</a>
+        <a v-if="project.editMode" class="cancel action-button" @click="toggleEditMode(project.id)">Cancel</a>
+        <a v-if="project.editMode" class="save action-button" @click="updateProject(project)">Save</a>
       </div>
     </div>
     <div class="details" v-if="state === 'running' && projects.length === 0">
@@ -51,8 +51,8 @@
 
 <script>
   export default {
-    name: 'left',
-    props: ['form', 'projects', 'selectedProject', 'username', 'userAlreadyHasProject', 'state'],
+    name: 'sidebar',
+    props: ['form', 'projects', 'selectedProjectId', 'username', 'userAlreadyHasProject', 'state'],
     methods: {
       toggleForm () {
         this.$emit('toggleForm')
@@ -60,14 +60,14 @@
       drag (event) {
         this.$emit('drag', event)
       },
-      updateSelectedProject (project) {
-        this.$emit('updateSelectedProject', project)
+      updateSelectedProject (projectId) {
+        this.$emit('updateSelectedProject', projectId)
       },
-      toggleEditMode () {
-        this.$emit('toggleEditMode')
+      toggleEditMode (projectId) {
+        this.$emit('toggleEditMode', projectId)
       },
-      updateProject () {
-        this.$emit('updateProject')
+      updateProject (project) {
+        this.$emit('updateProject', project)
       },
       deleteComment (id) {
         this.$emit('deleteProject', id)
@@ -125,7 +125,7 @@
     border:1px solid #777;
     margin:10px 0;
     padding:0 0 0 8px;
-    max-height:40px;
+    max-height:42px;
     transition: max-height 0.4s linear;
     will-change: max-height;
     position:relative;
@@ -139,6 +139,9 @@
     display:none;
     opacity:0;
     transition: opacity 0.4s linear;
+  }
+  .project .project-title-editor {
+    display:block;
   }
   .project .project-title-editor,
   .project .project-title {
@@ -163,6 +166,9 @@
     clear:both;
     opacity:0;
     transition: opacity 0.4s linear;
+  }
+  .project .project-description ul {
+    padding-left:16px;
   }
   .project .action-button-bar {
     width:100%;
@@ -192,9 +198,14 @@
     padding:8px;
     max-height:400px;
   }
+  .project.selected .project-author {
+    display:inline-block;
+  }
+  .project.selected .project-description {
+    display:block;
+  }
   .project.selected .project-description,
   .project.selected .project-author {
-    display:block;
     opacity:1;
   }
   .project.selected .project-title {

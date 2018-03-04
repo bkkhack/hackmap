@@ -1,5 +1,5 @@
 <template>
-  <div class="center-column">
+  <div class="center-column" @click="deselectProject">
     <h1>{{mainThread.title}}</h1>
     <a class="help-icon">?<div class="help-text" v-html="mainThread.helpText"></div></a>
     <a class="account-status" v-if="username" @click="logout" v-cloak>{{username}} (Log out)</a>
@@ -11,12 +11,12 @@
     <img v-bind:src="floorplan.url" class="floorplan" />
     <img class="marker" width="36"
       v-for="project in projects"
-      v-if="project.x"
+      v-if="project.x > 0 && project.y > 0 && floorplan.width > 0 && floorplan.height > 0"
       v-bind:key="project.id"
       v-bind:draggable="project.username === username"
       @dragstart="drag"
-      @click="updateSelectedProject(project)"
-      v-bind:class="{ selected: selectedProject === project }"
+      @click.stop="updateSelectedProject(project.id)"
+      v-bind:class="{ selected: selectedProjectId === project.id }"
       v-bind:data-id="project.id"
       v-bind:style="{ left: floorplan.width * project.x - 20 + 'px', top: floorplan.height * project.y - 20 + 'px' }"
       v-bind:src="project.avatar_thumbnail"
@@ -30,7 +30,7 @@
 <script>
   export default {
     name: 'center',
-    props: ['mainThread', 'username', 'projects', 'selectedProject', 'floorplan'],
+    props: ['mainThread', 'username', 'projects', 'selectedProjectId', 'floorplan'],
     methods: {
       dragevent (event) {
         event.preventDefault() // mark this element as a drop target.
@@ -49,8 +49,11 @@
       logout () {
         this.$emit('logout')
       },
-      updateSelectedProject (project) {
-        this.$emit('updateSelectedProject', project)
+      updateSelectedProject (projectId) {
+        this.$emit('updateSelectedProject', projectId)
+      },
+      deselectProject () {
+        this.$emit('updateSelectedProject', null)
       }
     },
     beforeDestroy () {

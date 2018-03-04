@@ -1,17 +1,17 @@
 <template>
   <div id="appContainer">
-    <left
+    <sidebar
       @toggleForm="toggleForm" @updateSelectedProject="updateSelectedProject"
       @toggleEditMode="toggleEditMode" @updateProject="updateProject" @deleteProject="deleteProject"
       @drag="leftDrag"
       :state="state"
       :form="form" :projects="projects"
-      :selectedProject="selectedProject" :username="username" :userAlreadyHasProject="userAlreadyHasProject">
-    </left>
+      :selectedProjectId="selectedProjectId" :username="username" :userAlreadyHasProject="userAlreadyHasProject">
+    </sidebar>
     <center
       @updateSelectedProject="updateSelectedProject"
       @login="login" @logout="logout" @drop="centerDrop"
-      :projects="projects" :selectedProject="selectedProject"
+      :projects="projects" :selectedProjectId="selectedProjectId"
       :mainThread="mainThread" :username="username"
       :floorplan="floorplan"
       >
@@ -22,7 +22,7 @@
 <script>
 import GitHubIssueService from '../github-issues.js'
 import auth from '../github-oauth.js'
-import Left from './Left.vue'
+import Sidebar from './Sidebar.vue'
 import Center from './Center.vue'
 
 let githubIssue
@@ -56,15 +56,7 @@ export default {
       username: '',
       userId: '',
       userAlreadyHasProject: false,
-      selectedProject: {
-        id: '',
-        avatar: '',
-        username: '',
-        editMode: '',
-        title: '',
-        descriptionHtml: '',
-        descriptionText: ''
-      }
+      selectedProjectId: ''
     }
   },
   methods: {
@@ -108,8 +100,8 @@ export default {
       var projectId = event.target.dataset.id
       event.dataTransfer.setData('projectId', projectId)
     },
-    updateSelectedProject (project) {
-      this.selectedProject = project
+    updateSelectedProject (projectId) {
+      this.selectedProjectId = projectId
     },
     centerDrop (event) {
       var projectId = event.dataTransfer.getData('projectId')
@@ -141,42 +133,37 @@ export default {
       this.username = ''
       githubIssue.deauthenticateClient()
     },
-    toggleEditMode () {
-      if (!this.selectedProject.editMode) { // entering edit mode
-        this.selectedProject.backup = {
-          title: this.selectedProject.title,
-          descriptionText: this.selectedProject.descriptionText
+    toggleEditMode (projectId) {
+      var projectIndex = this.projects.findIndex(project => project.id === projectId)
+      var project = this.projects[projectIndex]
+      if (!project.editMode) { // entering edit mode
+        project.backup = {
+          title: project.title,
+          descriptionText: project.descriptionText
         }
       } else { // cancelling edit mode
-        this.selectedProject.title = this.selectedProject.backup.title
-        this.selectedProject.descriptionText = this.selectedProject.backup.descriptionText
+        project.title = project.backup.title
+        project.descriptionText = project.backup.descriptionText
       }
-      this.selectedProject.editMode = !this.selectedProject.editMode
+      project.editMode = !project.editMode
     },
-    updateProject () {
-      githubIssue.updateProject(this.selectedProject)
+    updateProject (project) {
+      githubIssue.updateProject(project)
         .then(updatedProject => {
-          this.selectedProject = updatedProject
-          this.selectedProject.editMode = false
+          let index = this.projects.findIndex(p => p.id === updatedProject.id)
+          this.$set(this.projects, index, updatedProject)
         })
         .catch(err => {
           console.log('update rejected', err)
-          var backup = this.selectedProject.backup
-          this.selectedProject.title = backup.title
-          this.selectedProject.descriptionText = backup.descriptionText
+          var backup = project.backup
+          project.title = backup.title
+          project.descriptionText = backup.descriptionText
         })
     },
     deleteProject (id) {
       githubIssue.deleteProject(id)
         .then(() => {
-          this.selectedProject = {
-            id: '',
-            avatar: '',
-            username: '',
-            editMode: '',
-            title: '',
-            descriptionText: ''
-          }
+          this.selectedProjectId = null
           this.userAlreadyHasProject = false
           const indexResult = this.projects.findIndex(project => project.id === id)
           this.projects.splice(indexResult, 1)
@@ -191,7 +178,7 @@ export default {
     }
   },
   components: {
-    Left,
+    Sidebar,
     Center
   },
   mounted () {
