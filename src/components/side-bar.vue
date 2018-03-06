@@ -1,20 +1,19 @@
 <template>
-  <div class="projects side-column">
+  <div class="projects side-bar">
     <div class="project-form" v-bind:class="{ open: form.isOpen }">
       <input v-model="form.title" type="text" placeholder="Topic" autofocus>
       <textarea v-model="form.descriptionText" placeholder="Details (optional, uses markdown)"></textarea>
+      <button class="add-button" @click="toggleForm">+ Add your hack</button>
     </div>
-
-    <button v-if="userAlreadyHasProject" disabled="true" class="glow-button disabled" title="You've already added a hack!" @click="toggleForm">+ Add your hack</button>
-    <button v-else class="glow-button" @click="toggleForm">+ Add your hack</button>
-
+    <button v-if="user.hasProject" class="add-button" title="You've added a hack!" disabled>Hack Added!</button>
+    <button v-else class="add-button" @click="toggleForm">+ Add your hack</button>
     <div v-for="project in projects"
       @dragstart="drag"
       @click="updateSelectedProject(project.id)"
       v-bind:key="project.id"
       v-bind:data-id="project.id"
       v-bind:class="{ selected: selectedProjectId === project.id || project.editMode }"
-      v-bind:draggable="!(selectedProjectId === project.id && project.editMode) && project.username === username"
+      v-bind:draggable="!(selectedProjectId === project.id && project.editMode) && project.username === user.username"
       v-cloak
       class="project">
       <div class="project-title-bar">
@@ -23,15 +22,13 @@
         <input class="project-title-editor" v-else v-model="project.title" type="text" autofocus>
       </div>
       <img
-        class="project-author-avatar"
-        v-bind:title="project.username"
-        v-bind:alt="project.username"
         v-bind:src="selectedProjectId == project.id ? project.avatar : project.avatar_thumbnail"
+        v-bind:title="project.username" v-bind:alt="project.username"
         v-bind:data-dragicon="project.avatar_thumbnail"
-        draggable="false" />
+        class="project-author-avatar" draggable="false" />
       <div v-if="!project.editMode" class="project-description" v-html="project.descriptionHtml"></div>
       <textarea v-else class="project-description-editor" v-model="project.descriptionText"></textarea>
-      <div class="action-button-bar" v-if="(selectedProjectId == project.id || project.editMode) && project.username === username">
+      <div class="action-button-bar" v-if="(selectedProjectId == project.id || project.editMode) && project.username === user.username">
         <a v-if="!project.editMode" class="edit action-button" @click="toggleEditMode(project.id)">Edit</a>
         <a v-if="!project.editMode" class="delete action-button" @click="deleteComment(project.id)">Delete</a>
         <a v-if="project.editMode" class="cancel action-button" @click="toggleEditMode(project.id)">Cancel</a>
@@ -52,7 +49,7 @@
 <script>
   export default {
     name: 'sidebar',
-    props: ['form', 'projects', 'selectedProjectId', 'username', 'userAlreadyHasProject', 'state'],
+    props: ['form', 'projects', 'selectedProjectId', 'user', 'state'],
     methods: {
       toggleForm () {
         this.$emit('toggleForm')
@@ -77,20 +74,19 @@
 </script>
 
 <style>
-  .glow-button {
-    border-radius:4px;
-    border: 2px dashed #326fce;
-    box-sizing:border-box;
-    color: #326fce;
-    font-size:18pt;
-    height:40px;
-    height:40px;
+  .side-bar {
+    background-color: rgba(34, 34, 34, 0.8);
+  }
+  .add-button {
+    font-family: inherit; /* override system font */
+    grid-area: add-button;
     width:100%;
-    background-color:transparent;
+    color: #fff;
+    font-size:18pt;
+    background-color:#3a7ce2;
     outline:none;
+    border:none;
     cursor:pointer;
-    transition: all linear 0.2s;
-    animation: glow-button 1s infinite alternate
   }
   .glow-button:hover {
     animation: none;
@@ -110,20 +106,30 @@
     to { color: #3a7ce2; border-color: #3a7ce2 }
   }
   .project-form {
-    overflow:hidden;
-    max-height:0;
-    transition:max-height linear 0.4s;
+    position: absolute;
+    padding: 10px;
+    width:340px;
+    background-color: #3a7ce2;
+    transform: translate(-20%, -40%) scale(0);
+    will-change:transform;
+    transition: transform 150ms ease-in-out;
+    box-shadow: 0 0 5px #444;
   }
   .project-form.open {
-    max-height:500px;
+    transform: scale(1) translate(0);
+    transform: translate(0, 0) scale(1);
+    z-index: 2;
+  }
+  textarea {
+    margin-top:10px;
+    height:200px;
   }
   .project {
     -webkit-user-select: none;
     user-select: none;
     box-sizing:border-box;
     background-color:rgba(255, 255, 255, 0.1);
-    border:1px solid #777;
-    margin:10px 0;
+    margin-top:1px;
     padding:0 0 0 8px;
     max-height:42px;
     transition: max-height 0.4s linear;
@@ -194,9 +200,9 @@
     float:left;
   }
   .project.selected {
-    border:1px solid #397ce2;
     padding:8px;
     max-height:400px;
+    background-color:rgba(255, 255, 255, 0.2);
   }
   .project.selected .project-author {
     display:inline-block;
