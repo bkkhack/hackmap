@@ -227,6 +227,9 @@ export default {
     this.updateMapDimensions()
     // and on resize
     window.addEventListener('resize', this.updateMapDimensions)
+  },
+  beforeDestroy () {
+    window.removeEventListener('resize', this.updateMapDimensions)
   }
 }
 </script>

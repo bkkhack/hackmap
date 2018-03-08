@@ -1,27 +1,26 @@
 <template>
   <div class="center-column" @click="closeModals">
-    <img class="floorplan"
-      v-bind:src="floorplan.url"
-      ref="floorplanElement"
-      @dragenter="dragevent"
-      @dragover="dragevent"
-      @drop="drop" />
-    <img class="marker" width="36"
-      v-for="project in projects"
-      v-if="project.x > 0 && project.y > 0 && floorplan.width > 0 && floorplan.height > 0"
-      v-bind:key="project.id"
-      v-bind:draggable="project.username === user.username"
-      @dragstart="drag"
-      @click.stop="updateSelectedProject(project.id)"
-      v-bind:class="{ selected: selectedProjectId === project.id }"
-      v-bind:data-id="project.id"
-      v-bind:style="calculatePosition(project)"
-      v-bind:src="project.avatar_thumbnail"
-      v-bind:alt="project.username"
-      v-bind:title="project.title" />
+    <div class="droptarget"
+        @dragenter="dragevent"
+        @dragover="dragevent"
+        @drop="drop">
+      <img class="floorplan"
+        v-bind:src="floorplan.url" />
+      <img class="marker" width="36"
+        v-for="project in projects"
+        v-if="project.x > 0 && project.y > 0 && floorplan.width > 0 && floorplan.height > 0"
+        v-bind:key="project.id"
+        v-bind:draggable="project.username === user.username"
+        @dragstart="drag"
+        @click.stop="updateSelectedProject(project.id)"
+        v-bind:class="{ selected: selectedProjectId === project.id }"
+        v-bind:data-id="project.id"
+        v-bind:style="{ left: floorplan.width * project.x - 20 + 'px', top: floorplan.height * project.y - 20 + 'px' }"
+        v-bind:src="project.avatar_thumbnail"
+        v-bind:alt="project.username"
+        v-bind:title="project.title" />
     </div>
-    </div>
-</div>
+  </div>
 </template>
 
 <script>
@@ -29,13 +28,6 @@
     name: 'hack-map',
     props: ['mainThread', 'user', 'projects', 'selectedProjectId', 'floorplan'],
     methods: {
-      calculatePosition (project) {
-        var el = this.$refs.floorplanElement.getBoundingClientRect()
-        return {
-          left: el.x + this.floorplan.width * project.x - 20 + 'px',
-          top: el.y + this.floorplan.height * project.y - 20 + 'px'
-        }
-      },
       dragevent (event) {
         event.preventDefault() // mark this element as a drop target.
         event.dataTransfer.dropEffect = 'copy'
@@ -53,9 +45,6 @@
       closeModals () {
         this.$emit('closeModals')
       }
-    },
-    beforeDestroy () {
-      window.removeEventListener('resize', this.updateMapDimensions)
     }
 }
 </script>
@@ -65,14 +54,17 @@
     padding:40px;
     max-height:100%; /* seems required for firefox to appropriately scale tall hackmap images */
   }
+  .droptarget {
+    width:90%;
+    max-width:600px;
+    position:relative;
+    margin:0 auto 0 auto;
+  }
   .floorplan {
     /* floorplan image is assumed to be black vector image */
     filter:invert(100%) opacity(40%);
     z-index:0;
-    max-width: 100%;
-    max-height: 100%;
-    margin: 0 auto;
-    display: block;
+    width:100%;
     user-select:none;
   }
   .marker {
@@ -80,6 +72,7 @@
     z-index:1;
     transition: box-shadow 100ms ease-in-out;
     box-shadow: 0 0 0 0 #3a7be2;
+    user-select:none;
   }
   .marker.selected {
     animation: pulse 0.8s 3;
