@@ -1,37 +1,32 @@
 <template>
   <div id="appContainer">
-    <left
+    <header-bar class="header-bar"
+      @login="login" @logout="logout"
+      :user="user" :mainThread="mainThread" />
+    <side-bar class="side-bar"
       @toggleForm="toggleForm" @updateSelectedProject="updateSelectedProject"
-      @drag="leftDrag"
-      :state="state"
-      :form="form" :projects="projects"
-      :selectedProject="selectedProject" :username="username" :userAlreadyHasProject="userAlreadyHasProject">
-    </left>
-    <center
-      @updateSelectedProject="updateSelectedProject"
-      @login="login" @logout="logout" @drop="centerDrop"
-      :projects="projects" :selectedProject="selectedProject"
-      :mainThread="mainThread" :username="username"
-      :floorplan="floorplan"
-      >
-    </center>
-    <right
       @toggleEditMode="toggleEditMode" @updateProject="updateProject" @deleteProject="deleteProject"
-      :selectedProject="selectedProject" :username="username">
-    </right>
+      @drag="leftDrag"
+      :projects="projects" :selectedProjectId="selectedProjectId"
+      :user="user" :state="state" :form="form" />
+    <hack-map class="hack-map"
+      @updateSelectedProject="updateSelectedProject"
+      @drop="centerDrop" @closeModals="closeModals"
+      :projects="projects" :selectedProjectId="selectedProjectId"
+      :user="user" :floorplan="floorplan" />
   </div>
 </template>
 
 <script>
 import GitHubIssueService from '../github-issues.js'
-import auth from '../github-oauth.js'
-import Left from './Left.vue'
-import Center from './Center.vue'
-import Right from './Right.vue'
+import Auth from '../github-oauth.js'
+import HeaderBar from './header-bar.vue'
+import SideBar from './side-bar.vue'
+import HackMap from './hack-map.vue'
 
 let githubIssue
 export default {
-  name: 'hackmap',
+  name: 'app',
   props: {
     issueNumber: {
       default: '',
@@ -40,7 +35,7 @@ export default {
   },
   data () {
     return {
-      state: '',
+      state: 'init',
       mainThread: {
         title: '',
         helpText: ''
@@ -50,6 +45,7 @@ export default {
         width: 0,
         height: 0
       },
+      selectedProjectId: '',
       projects: [],
       form: {
         isOpen: false,
@@ -57,17 +53,10 @@ export default {
         descriptionText: ''
       },
       authenticationUrl: '',
-      username: '',
-      userId: '',
-      userAlreadyHasProject: false,
-      selectedProject: {
+      user: {
         id: '',
-        avatar: '',
         username: '',
-        editMode: '',
-        title: '',
-        descriptionHtml: '',
-        descriptionText: ''
+        hasProject: false
       }
     }
   },
@@ -102,13 +91,22 @@ export default {
       }
     },
     leftDrag (event) {
-      var avatar = event.target.querySelector('img')
-      event.dataTransfer.setDragImage(avatar, 20, 20)
+      var avatar = event.target.querySelector('.project-author-avatar')
+
+      var dragIcon = document.createElement('img')
+      dragIcon.src = avatar.dataset.dragicon
+      event.dataTransfer.setDragImage(dragIcon, 20, 20)
+
+      // event.dataTransfer.setDragImage(avatar, 20, 20)
       var projectId = event.target.dataset.id
       event.dataTransfer.setData('projectId', projectId)
     },
-    updateSelectedProject (project) {
-      this.selectedProject = project
+    updateSelectedProject (projectId) {
+      this.selectedProjectId = projectId
+    },
+    closeModals () {
+      this.selectedProjectId = null
+      this.form.isOpen = false
     },
     centerDrop (event) {
       var projectId = event.dataTransfer.getData('projectId')
@@ -137,46 +135,41 @@ export default {
       githubIssue.ensureAuthenticatedClient().then(data => console.log(data))
     },
     logout () {
-      this.username = ''
+      this.user.username = ''
       githubIssue.deauthenticateClient()
     },
-    toggleEditMode () {
-      if (!this.selectedProject.editMode) { // entering edit mode
-        this.selectedProject.backup = {
-          title: this.selectedProject.title,
-          descriptionText: this.selectedProject.descriptionText
+    toggleEditMode (projectId) {
+      var projectIndex = this.projects.findIndex(project => project.id === projectId)
+      var project = this.projects[projectIndex]
+      if (!project.editMode) { // entering edit mode
+        project.backup = {
+          title: project.title,
+          descriptionText: project.descriptionText
         }
       } else { // cancelling edit mode
-        this.selectedProject.title = this.selectedProject.backup.title
-        this.selectedProject.descriptionText = this.selectedProject.backup.descriptionText
+        project.title = project.backup.title
+        project.descriptionText = project.backup.descriptionText
       }
-      this.selectedProject.editMode = !this.selectedProject.editMode
+      project.editMode = !project.editMode
     },
-    updateProject () {
-      githubIssue.updateProject(this.selectedProject)
+    updateProject (project) {
+      githubIssue.updateProject(project)
         .then(updatedProject => {
-          this.selectedProject = updatedProject
-          this.selectedProject.editMode = false
+          let index = this.projects.findIndex(p => p.id === updatedProject.id)
+          this.$set(this.projects, index, updatedProject)
         })
         .catch(err => {
           console.log('update rejected', err)
-          var backup = this.selectedProject.backup
-          this.selectedProject.title = backup.title
-          this.selectedProject.descriptionText = backup.descriptionText
+          var backup = project.backup
+          project.title = backup.title
+          project.descriptionText = backup.descriptionText
         })
     },
     deleteProject (id) {
       githubIssue.deleteProject(id)
         .then(() => {
-          this.selectedProject = {
-            id: '',
-            avatar: '',
-            username: '',
-            editMode: '',
-            title: '',
-            descriptionText: ''
-          }
-          this.userAlreadyHasProject = false
+          this.user.hasProject = false
+          this.selectedProjectId = null
           const indexResult = this.projects.findIndex(project => project.id === id)
           this.projects.splice(indexResult, 1)
         })
@@ -190,23 +183,25 @@ export default {
     }
   },
   components: {
-    Left,
-    Center,
-    Right
+    HeaderBar,
+    SideBar,
+    HackMap
   },
   mounted () {
     githubIssue = new GitHubIssueService({
       organization: 'bkkhack',
       repository: 'hackmap',
       label: 'BKKHack Main Thread',
-      onAuthenticationRequired: auth.getOAuthToken,
+      onAuthenticationRequired: Auth.getOAuthToken,
       pollIntervalSeconds: 60,
       onProjectsUpdated: projects => {
         this.$set(this.$data, 'state', 'running')
-        this.projects = projects
-        const loggingInUserComment = this.projects.find(comment => comment.userId === this.userId)
-        if (loggingInUserComment !== undefined) {
-          this.userAlreadyHasProject = true
+        this.user.hasProject = projects
+            .some(project => project.userId === this.user.id)
+
+        // don't reset projects if the user is editing one of them
+        if (!this.projects.some(project => project.editMode)) {
+          this.projects = projects
         }
       },
       onMainThreadLoaded: thread => {
@@ -215,15 +210,12 @@ export default {
         this.floorplan.url = thread.floorplanUrl
       },
       onUserAuthenticated: response => {
-        this.username = response.data.login
-        this.userId = response.data.id
+        this.user.username = response.data.login
+        this.user.id = response.data.id
       },
       issueNumber: this.issueNumber,
       onError: errMsg => {
         this.notifyError(errMsg)
-      },
-      onInit: () => {
-        this.$set(this.$data, 'state', 'init')
       }
     })
     // we need to calculate map dimensions in order to place the avatars
@@ -244,10 +236,13 @@ export default {
     margin: 0;
     padding: 0;
     height: 100%;
+    color: #fff;
+    font-family: Raleway, sans-serif;
   }
   html {
     /* css blueprint pattern */
     background-color:#269;
+    background-color:#3481bb;
     background-image: linear-gradient(rgba(255, 255, 255, .1) 2px, transparent 2px),
     linear-gradient(90deg, rgba(255, 255, 255, .2) 1px, transparent 2px),
     linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px),
@@ -255,6 +250,26 @@ export default {
     background-size:100px 100px, 100px 100px, 20px 20px, 20px 20px;
     background-position:-2px -2px, -2px -2px, -1px -1px, -1px -1px;
   }
+  #appContainer {
+    display:grid;
+    grid-template-rows: 60px auto;
+    grid-template-columns: 300px auto;
+    grid-template-areas: "side-bar  header-bar"
+                         "side-bar    hack-map";
+  }
+  .header-bar {
+    grid-area: header-bar;
+  }
+  .side-bar {
+    grid-area: side-bar;
+  }
+  .add-button {
+    height:60px;
+  }
+  .hack-map {
+    grid-area: hack-map;
+  }
+  /*
   #appContainer {
     color:#fff;
     font-family:sans-serif;
@@ -264,37 +279,26 @@ export default {
     justify-content:flex-start;
     align-items:stretch;
   }
+  */
   a {
-    color:#fff;
     font-weight:bold;
     text-decoration:none;
     cursor:pointer;
   }
-  h1 {
-    font-weight:normal;
-    text-align:center;
-    font-size:24pt;
-    margin:0;
-    -webkit-user-select: none;
-    user-select: none;
-  }
   input[type='text'], textarea {
     box-sizing:border-box;
-    border-radius:5px;
+    font-family:sans-serif;
     font-size:1em;
     width:100%;
-    margin-bottom:5px;
-    padding: 0.4em;
+    padding: 0.3em;
     outline:none;
     transition:background-color linear 0.2s;
     background-color:rgba(255,255,255,.9);
+    border:1px solid #397ce2;
   }
   input:focus,
   textarea:focus {
     background-color:rgba(255,255,255,1);
-  }
-  textarea {
-    height:200px;
   }
   img[draggable='true'],
   div[draggable='true'] {
@@ -304,39 +308,6 @@ export default {
     /* If marked with v-cloak (vue cloak), this overrides everything.
      * Vue will remove this attribute when it's initialized. */
   visibility: hidden !important;
-  }
-
-  /*
-   * General app layout
-   */
-
-  .center-column,
-  .side-column {
-    padding:10px;
-    min-height:550px;
-    overflow-y:auto;
-  }
-  .center-column {
-    order: 2;
-    flex: 1;
-    background-image: radial-gradient(circle at 50% 50%, rgba(0, 153, 255, 0.2) 0%, rgba(255, 255, 255, 0) 50%);
-    position: relative;
-  }
-  .side-column {
-    background-color:rgba(51, 51, 51, 0.8);
-    box-shadow:0 0 10px #000;
-    box-sizing:border-box;
-    flex-basis: 300px;
-  }
-  .projects.side-column {
-    order: 1;
-    overflow: scroll;
-  }
-  .details.side-column {
-    order: 3;
-    text-align:center;
-    padding-top:60px;
-    position: relative;
   }
 
   /* github avatar resizes -- github stopped respecting the &s parameter

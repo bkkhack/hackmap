@@ -19,8 +19,8 @@ import githubApiClient from './github-api-client.js'
  */
 export default class GitHubIssueService {
   constructor (config) {
+    this.lastUpdateSent = new Date(0)
     this.config = config
-    this.config.onInit()
     this.github = githubApiClient(config.organization, config.repository)
 
     // if the user has already logged in (e.g. in a previous session), use the
@@ -54,7 +54,7 @@ export default class GitHubIssueService {
       .then((response) => response.data)
       .catch((err) => {
         this.reportError(err)
-        throw new Error('Unable get issues data')
+        throw new Error('Unable to get a list of issues from github')
       })
   }
 
@@ -90,6 +90,7 @@ export default class GitHubIssueService {
   updateProjectAjaxCall (project, httpVerb, url) {
     return this.ensureAuthenticatedClient()
       .then(() => {
+        this.lastUpdateSent = new Date()
         let body = serialization.serializeProjectToComment(project)
         return this.github.repo[httpVerb](url, { body: body }, {
           headers: serialization.commentFormat
@@ -108,17 +109,34 @@ export default class GitHubIssueService {
   }
 
   pollIssueForComments () {
-    var commentsUrl = 'issues/' + this.issueNumber + '/comments'
+    let commentsUrl = 'issues/' + this.issueNumber + '/comments'
     var etag
 
-    var poll = () => {
-      if (window.document.hidden) {
-        console.log('skipping poll because tab is hidden')
+    var poll = (isFirstPoll) => {
+      // first request should not be cached by the browser.
+      // this prevents users from refreshing immediately after
+      // entering their hack and not seeing their hack appear.
+      var now = new Date()
+      var requestUrl = isFirstPoll
+        ? commentsUrl + '?nocache=' + now.getTime()
+        : commentsUrl
+
+      // don't poll if the user sent an update in the last 15s.
+      // GitHub's API doesn't immediately reflect the latest information,
+      // so give it some time for updates to propagate.
+      if (now - this.lastUpdateSent < 15000) {
+        console.log('skipping poll because of a recent update from this client')
         return Promise.resolve()
       }
+      if (window.document.hidden) {
+        console.log('skipping poll because tab is hidden')
+        window.addEventListener('visibilitychange', poll, {once: true})
+        return Promise.resolve()
+      }
+
       console.log('polling with etag ' + etag)
       return this.github.repo
-        .get(commentsUrl, {
+        .get(requestUrl, {
           headers: Object.assign(
             serialization.commentFormat,
             // use etag for caching, as described in https://developer.github.com/v3/#conditional-requests
@@ -142,7 +160,7 @@ export default class GitHubIssueService {
     console.log('start polling')
     let interval = 1000 * this.config.pollIntervalSeconds
     window.setInterval(poll, interval)
-    return poll()
+    return poll(true)
   }
 
   ensureAuthenticatedClient () {

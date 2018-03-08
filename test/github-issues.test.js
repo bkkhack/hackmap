@@ -72,7 +72,7 @@ describe('GitHubIssueService', () => {
         let cfg = validConfig()
         cfg.onError = (error) => {
           expect(error).toBeInstanceOf(Error)
-          expect(error.message).toEqual('Unable get issues data')
+          expect(error.message).toEqual('Unable to get a list of issues from github')
           done()
         }
         instance(cfg)
@@ -122,16 +122,6 @@ describe('GitHubIssueService', () => {
         expect(mainThread.title).toEqual(expectedThread.title)
         expect(mainThread.helpText).toEqual(expectedThread.helpText)
         expect(mainThread.floorplanUrl).toEqual(expectedThread.floorplanUrl)
-        done()
-      }
-      instance(cfg)
-    })
-  })
-
-  describe('.onInit callback ', () => {
-    it('will be fired when starting the service', (done) => {
-      let cfg = validConfig()
-      cfg.onInit = () => {
         done()
       }
       instance(cfg)

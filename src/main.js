@@ -1,15 +1,37 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
-import App from './App'
-import router from './router'
+import Router from 'vue-router'
+import App from './components/app'
 
 Vue.config.productionTip = false
+Vue.use(Router)
+
+// html5 drag-and-drop support for mobile
+import {polyfill} from 'mobile-drag-drop'
+polyfill()
+
+const router = new Router({
+  mode: 'history',
+  base: window.location.pathname,
+  routes: [
+    {
+      path: '',
+      name: 'lastest',
+      component: App
+    },
+    {
+      path: ':issueNumber',
+      name: 'history',
+      component: App,
+      props: true
+    }
+  ]
+})
 
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
   router,
-  template: '<App/>',
-  components: { App }
+  template: '<router-view />'
 })
