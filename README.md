@@ -53,17 +53,16 @@ Again, most major editors have an [editorconfig plugin](http://editorconfig.org/
 
 ```
 src
-├── main.js - main entry point for the UI rendering
-├── App.vue - draws the application, handles communication between components.
 ├── components
-│   ├── Center.vue - main screen with the map
-│   ├── Left.vue - left sidebar, with the project list
-│   └── Right.vue - right sidebar, with the project detail
-├── floorplan
-│   └── xxxxxxx.svg - floorplan image, we update this for each location
+│   ├── app.vue - top-level component, controls the main application behavior using github-issues.js 
+│   ├── hack-map.vue - the center panel with the map
+│   ├── header-bar.vue - the header with the help and login buttons
+│   └── side-bar.vue - the left sidebar that lists the projects
 ├── github-issues.js - main entry point for the application logic, handles polling.
+├── github-api-client.js - configures the axios http library to talk with github
 ├── github-oauth.js - contains the oauth dance logic for github authentication
-└── github-serialization.js - converts projects to github comments for storage, and vice versa
+├── github-serialization.js - converts projects to github comments for storage, and vice versa
+└── main.js - Vue.js bootstrapping code (e.g. vue.js initialization, router configuration)
 
 test
 └── unit tests
