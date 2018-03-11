@@ -163,9 +163,16 @@ export default class GitHubIssueService {
     return poll(true)
   }
 
-  ensureAuthenticatedClient () {
+  /**
+   * Call the onAuthenticationRequired callback to get an auth token
+   * and create an authenticated github api client from that token
+   * @param reauthenticateOnError - defaults to true, if authentication fails (e.g. to a expired token) should we attempt to reauthenticate?
+   */
+  ensureAuthenticatedClient (reauthenticateOnError = true) {
     return this.config.onAuthenticationRequired()
       .then(token => {
+        // if we're not currently authenticated, use the
+        // token to create an authenticated client.
         if (!this.github.isAuthenticated) {
           this.github = githubApiClient(this.config.organization, this.config.repository, token)
           this.github.isAuthenticated = true
@@ -174,6 +181,13 @@ export default class GitHubIssueService {
       }).then(response => {
         if (response) {
           this.config.onUserAuthenticated(response)
+        }
+      }).catch(err => {
+        console.log(err)
+        auth.logOut()
+        if (reauthenticateOnError) {
+          this.github.isAuthenticated = false
+          return this.ensureAuthenticatedClient(false)
         }
       })
   }
