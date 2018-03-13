@@ -1,7 +1,7 @@
 <template>
   <div class="projects side-bar">
     <div class="project-form" v-bind:class="{ open: form.isOpen }">
-      <input v-model="form.title" type="text" placeholder="Topic" autofocus>
+      <input v-model="form.title" type="text" placeholder="Topic" maxlength="40" autofocus>
       <textarea v-model="form.descriptionText" placeholder="Details (optional, uses markdown)"></textarea>
       <button class="add-button" @click="toggleForm">+ Add your hack</button>
     </div>
@@ -19,7 +19,7 @@
       <div class="project-title-bar">
         <a class="project-author" v-bind:href="'https://github.com/' + project.username" draggable="false">@{{project.username}}</a>
         <div class="project-title" v-if="!project.editMode">{{project.title}}</div>
-        <input class="project-title-editor" v-else v-model="project.title" type="text" autofocus>
+        <input class="project-title-editor" v-else v-model="project.title" type="text" maxlength="40" autofocus>
       </div>
       <img
         v-bind:src="selectedProjectId == project.id ? project.avatar : project.avatar_thumbnail"
@@ -155,6 +155,9 @@
   }
   .project .project-title {
     width: 220px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .project .project-author-avatar {
     float:right;
@@ -216,6 +219,10 @@
   }
   .project.selected .project-title {
     width:170px;
+    /* undo the ellipsis configuration, so we don't truncate the title */
+    white-space: normal;
+    overflow: auto;
+    text-overflow: unset;
   }
   .project.selected .project-author-avatar {
     width:76px;
