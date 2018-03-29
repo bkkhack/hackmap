@@ -21,14 +21,15 @@ describe('serialization', () => {
     let issue = {
       number: 123,
       title: 'Febtember 2018 Hacknight',
-      body: 'welcome to bkkhack!\r\n<!--\r\nfloorplan : http://www.example.com/foo.jpg\r\n -->'
+      body: 'welcome to bkkhack!\r\n<!--\r\nfloorplan : http://www.example.com/foo.jpg\r\n -->',
+      body_html: 'welcome to bkkhack!\r\n<!--\r\nfloorplan : http://www.example.com/foo.jpg\r\n -->'
     }
 
     let thread = serialization.deserializeIssueToMainThread(issue)
 
     expect(thread.number).toEqual(123)
     expect(thread.title).toEqual(issue.title)
-    expect(thread.helpText).toEqual(issue.body)
+    expect(thread.helpHtml).toEqual(issue.body_html)
     expect(thread.floorplanUrl).toEqual('http://www.example.com/foo.jpg')
   })
 })

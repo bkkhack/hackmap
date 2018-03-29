@@ -205,7 +205,7 @@ export default {
         }
       },
       onMainThreadLoaded: thread => {
-        this.mainThread.helpText = thread.helpText
+        this.mainThread.helpHtml = thread.helpHtml
         this.mainThread.title = thread.title
         this.floorplan.url = thread.floorplanUrl
       },
@@ -272,21 +272,11 @@ export default {
   .hack-map {
     grid-area: hack-map;
   }
-  /*
-  #appContainer {
-    color:#fff;
-    font-family:sans-serif;
-    display:flex;
-    flex-wrap:wrap;
-    flex-direction:row;
-    justify-content:flex-start;
-    align-items:stretch;
-  }
-  */
   a {
     font-weight:bold;
     text-decoration:none;
     cursor:pointer;
+    color:#fff;
   }
   input[type='text'], textarea {
     box-sizing:border-box;
@@ -310,7 +300,7 @@ export default {
   [v-cloak] {
     /* If marked with v-cloak (vue cloak), this overrides everything.
      * Vue will remove this attribute when it's initialized. */
-  visibility: hidden !important;
+    visibility: hidden !important;
   }
 
   /* github avatar resizes -- github stopped respecting the &s parameter

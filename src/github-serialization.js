@@ -51,7 +51,7 @@ export default {
 
     return {
       title: issue.title,
-      helpText: issue.body,
+      helpHtml: issue.body_html,
       number: issue.number,
       floorplanUrl: floorplanUrl
     }
