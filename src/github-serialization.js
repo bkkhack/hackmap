@@ -31,6 +31,8 @@ export default {
       descriptionHtml: descriptionHtml,
       username: comment.user.login,
       userId: comment.user.id,
+      // see https://developer.github.com/v4/reference/enum/commentauthorassociation/
+      userIsAdmin: comment.author_association === 'MEMBER' || comment.author_association === 'OWNER',
       avatar_thumbnail: comment.user.avatar_url + '&s=' + 40,
       avatar: comment.user.avatar_url + '&s=' + 80,
       x: coords.x,
