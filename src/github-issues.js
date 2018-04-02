@@ -51,7 +51,10 @@ export default class GitHubIssueService {
   getIssues () {
     return this.github.repo
       .get('issues', {
-        params: { labels: this.config.label },
+        params: {
+          state: 'all', // supports viewing past threads that have since been closed.
+          labels: this.config.label
+        },
         headers: serialization.commentFormat
       })
       .then((response) => response.data)
