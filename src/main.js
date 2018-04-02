@@ -12,19 +12,18 @@ import {polyfill} from 'mobile-drag-drop'
 polyfill()
 
 const router = new Router({
-  mode: 'history',
   base: window.location.pathname,
   routes: [
     {
-      path: '',
-      name: 'lastest',
-      component: App
-    },
-    {
-      path: ':issueNumber',
+      path: '/events/:issueNumber',
       name: 'history',
       component: App,
       props: true
+    },
+    {
+      path: '*',
+      name: 'latest',
+      component: App
     }
   ]
 })
