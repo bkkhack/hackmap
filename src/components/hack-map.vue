@@ -10,7 +10,7 @@
         v-for="project in projects"
         v-if="project.x > 0 && project.y > 0 && floorplan.width > 0 && floorplan.height > 0"
         v-bind:key="project.id"
-        v-bind:draggable="project.username === user.username"
+        v-bind:draggable="project.username === user.username || user.isAdmin"
         @dragstart="drag"
         @click.stop="updateSelectedProject(project.id)"
         v-bind:class="{ selected: selectedProjectId === project.id }"

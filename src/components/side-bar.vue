@@ -13,7 +13,7 @@
       v-bind:key="project.id"
       v-bind:data-id="project.id"
       v-bind:class="{ selected: selectedProjectId === project.id || project.editMode }"
-      v-bind:draggable="!(selectedProjectId === project.id && project.editMode) && project.username === user.username"
+      v-bind:draggable="!(selectedProjectId === project.id && project.editMode) && (project.username === user.username || user.isAdmin)"
       v-cloak
       class="project">
       <div class="project-title-bar">
@@ -28,7 +28,7 @@
         class="project-author-avatar" draggable="false" />
       <div v-if="!project.editMode" class="project-description" v-html="project.descriptionHtml"></div>
       <textarea v-else class="project-description-editor" v-model="project.descriptionText"></textarea>
-      <div class="action-button-bar" v-if="(selectedProjectId == project.id || project.editMode) && project.username === user.username">
+      <div class="action-button-bar" v-if="(selectedProjectId == project.id || project.editMode) && (project.username === user.username || user.isAdmin)">
         <a v-if="!project.editMode" class="edit action-button" @click="toggleEditMode(project.id)">Edit</a>
         <a v-if="!project.editMode" class="delete action-button" @click="deleteComment(project.id)">Delete</a>
         <a v-if="project.editMode" class="cancel action-button" @click="toggleEditMode(project.id)">Cancel</a>

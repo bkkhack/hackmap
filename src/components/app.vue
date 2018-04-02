@@ -56,7 +56,8 @@ export default {
       user: {
         id: '',
         username: '',
-        hasProject: false
+        hasProject: false,
+        isAdmin: false
       }
     }
   },
@@ -201,9 +202,13 @@ export default {
       pollIntervalSeconds: 60,
       onProjectsUpdated: projects => {
         this.$set(this.$data, 'state', 'running')
-        this.user.hasProject = projects
-            .some(project => project.userId === this.user.id)
+        var projectForLoggedInUser = projects
+            .filter(project => project.userId === this.user.id)
 
+        if (projectForLoggedInUser.length) {
+          this.user.hasProject = true
+          this.user.isAdmin = projectForLoggedInUser[0].userIsAdmin
+        }
         // don't reset projects if the user is editing one of them
         if (!this.projects.some(project => project.editMode)) {
           this.projects = projects
