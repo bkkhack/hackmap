@@ -150,7 +150,7 @@ export default class GitHubIssueService {
           console.log('poll response ' + response.status)
           if (response.status === 200) {
             etag = response.headers.etag
-            var projects = response.data.map(serialization.deserializeCommentToProject)
+            var projects = this.pickFirstProjectPerUser(response.data)
             this.config.onProjectsUpdated(projects)
           }
         })
@@ -164,6 +164,22 @@ export default class GitHubIssueService {
     let interval = 1000 * this.config.pollIntervalSeconds
     window.setInterval(poll, interval)
     return poll(true)
+  }
+
+  // sometimes users reply directly on github, which would make them have two hacks: their original and their reply.
+  // to avoid this, only show the first project in the list.
+  pickFirstProjectPerUser (commentList) {
+    var projects = []
+    var projectsByUser = {}
+    // we could just use a single object here, but an object doesn't guarantee preserved order of its properties
+    commentList.forEach(comment => {
+      var project = serialization.deserializeCommentToProject(comment)
+      if (!projectsByUser[project.username]) {
+        projectsByUser[project.username] = project
+        projects.push(project)
+      }
+    })
+    return projects
   }
 
   /**
