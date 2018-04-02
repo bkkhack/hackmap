@@ -115,10 +115,15 @@ export default {
       // record old x and y values in case the API rejects our update, so we can revert to them
       var oldX = project.x
       var oldY = project.y
+      // calculate offset from the map (currentTarget). We can't use the event's offsetX/Y
+      // because those properties are relative to the event's target, and it's not guaranteed
+      // that the event's target is the map -- it could be another avatar.
+      var offsetX = event.pageX - event.currentTarget.getBoundingClientRect().left
+      var offsetY = event.pageY - event.currentTarget.getBoundingClientRect().top
       // the map is a percentage width of the overall window, so we need
       // to save x and y as percentage values.
-      project.x = event.offsetX / this.floorplan.width
-      project.y = event.offsetY / this.floorplan.height
+      project.x = offsetX / this.floorplan.width
+      project.y = offsetY / this.floorplan.height
       githubIssue.updateProject(project)
         .catch(err => {
           console.log('update rejected', err)
