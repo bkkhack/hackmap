@@ -2,7 +2,7 @@
   <div class="header-bar">
     <h1>{{mainThread.title}}</h1>
     <div class="header-bar-links">
-      <a class="help-icon">Help<div class="help-text" v-html="mainThread.helpText"></div></a>
+      <a class="help-icon">Help<div class="help-text" v-html="mainThread.helpHtml"></div></a>
       <a class="account-status" v-if="user.username" @click="logout" v-cloak>{{user.username}} (Log out)</a>
       <a class="account-status" v-else title="Log in with GitHub" @click="login" v-cloak>Log in</a>
     </div>
@@ -44,9 +44,10 @@ h1 {
   position:absolute;
   right:0;
 }
-.header-bar-links a {
+.header-bar-links > a {
   /* cover the h1 if we've ran out of room */
   background-color:#fff;
+  color:#2B5285;
 }
 .account-status {
   background-repeat:no-repeat;
@@ -68,7 +69,6 @@ h1 {
   font-weight:normal;
   z-index:2;
   padding:10px;
-  white-space: pre-line; /* honor line breaks that the user typed */
   transform: translate(-0%, -50%) scale(0);
   will-change:transform;
   transition: transform 150ms ease-in-out;

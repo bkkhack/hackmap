@@ -50,7 +50,10 @@ export default class GitHubIssueService {
    */
   getIssues () {
     return this.github.repo
-      .get('issues', { params: { labels: this.config.label } })
+      .get('issues', {
+        params: { labels: this.config.label },
+        headers: serialization.commentFormat
+      })
       .then((response) => response.data)
       .catch((err) => {
         this.reportError(err)
