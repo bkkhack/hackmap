@@ -119,8 +119,13 @@ export default {
       // calculate offset from the map (currentTarget). We can't use the event's offsetX/Y
       // because those properties are relative to the event's target, and it's not guaranteed
       // that the event's target is the map -- it could be another avatar.
-      var offsetX = event.pageX - event.currentTarget.getBoundingClientRect().left
-      var offsetY = event.pageY - event.currentTarget.getBoundingClientRect().top
+      var mapBoundingBox = event.currentTarget.getBoundingClientRect()
+      var mapPosition = {
+        x: mapBoundingBox.left + document.documentElement.scrollLeft,
+        y: mapBoundingBox.top + document.documentElement.scrollTop
+      }
+      var offsetX = event.pageX - mapPosition.x
+      var offsetY = event.pageY - mapPosition.y
       // the map is a percentage width of the overall window, so we need
       // to save x and y as percentage values.
       project.x = offsetX / this.floorplan.width
