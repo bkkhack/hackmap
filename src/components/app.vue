@@ -103,7 +103,8 @@ export default {
       event.dataTransfer.setData('projectId', projectId)
     },
     updateSelectedProject (projectId) {
-      this.selectedProjectId = projectId
+      this.selectedProjectId =
+        this.selectedProjectId === projectId ? null : projectId
     },
     closeModals () {
       this.selectedProjectId = null
