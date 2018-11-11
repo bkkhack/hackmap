@@ -1,9 +1,11 @@
 {
-  "name": "hackmap",
+  "name": "@bkkhack/hackmap",
   "repository": "bkkhack/hackmap",
   "version": "1.0.0",
   "description": "A tool to help collaborate at bkkhack",
-  "main": "index.js",
+  "homepage": "https://github.com/bkkhack/hackmap#readme",
+  "bugs": "https://github.com/bkkhack/hackmap/issues",
+  "browser": "index.js",
   "scripts": {
     "dev": "node build/dev-server.js",
     "start": "node build/dev-server.js",
@@ -14,7 +16,11 @@
     "lint": "eslint --ext .js,.vue src"
   },
   "author": "BKKHack Members",
-  "license": "ISC",
+  "license": "MIT",
+  "private": true,
+  "config": {
+    "port": 8080
+  },
   "dependencies": {
     "axios": "^0.18.0",
     "axios-mock-adapter": "^1.12.0",
