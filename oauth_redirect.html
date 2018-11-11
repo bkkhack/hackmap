@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Success</title>
+<link href="static/css/app.c64c0d4676d24e37cca1e71c948acf3e.css" rel="stylesheet"></head>
+<body>
+    Good job! Redirecting...
+    <script>
+        // github.com will redirect to this page, after the user allows oauth access.
+        // this page is in a popup window / new tab. We read the `code` query parameter
+        // and send it to the main (opener) window using an event.
+        var code = window.location.href.match(/\?code=(.*)/);
+        if(code) {
+            code = code[1];
+            window.opener.dispatchEvent(new CustomEvent(
+                "oauth-code-received",
+                { detail: code }
+            ));
+        }
+    </script>
+<script type="text/javascript" src="static/js/manifest.f490725c19853b2ae5df.js"></script><script type="text/javascript" src="static/js/vendor.9bd4692f350c23a9f80e.js"></script><script type="text/javascript" src="static/js/app.ff13595d8022c1ea7803.js"></script></body>
+</html>
